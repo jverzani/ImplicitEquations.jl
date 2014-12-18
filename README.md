@@ -48,6 +48,7 @@ The coloring scheme employed follows Tupper:
 * black if the predicate is definitely satisfied somewhere in the pixel
 * and red if it is unknown.
 
+![Batman Curve](http://i.imgur.com/NuOY92b.png)
 
 For this
 [Batman equation](http://yangkidudel.wordpress.com/2011/08/02/love-and-mathematics/)
@@ -86,7 +87,7 @@ The above example illustrates a few things:
   white, if `TRUE` color them black, if not divide into 4 smaller
   regions and check again. 
 
-[Imgur](http://i.imgur.com/NuOY92b.png)
+
 
 	For images that require a lot of checking, the graphs can be **really slow** to render.
 
