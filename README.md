@@ -13,15 +13,18 @@ the `julia` user to naturally represent and easily render such graphs.
 
 
 For example, the
-[conchoid](http://www-groups.dcs.st-and.ac.uk/~history/Curves/Conchoid.html)
+[Trident of Newton](http://www-history.mcs.st-and.ac.uk/Curves/Trident.html)
 can be represented in Cartesian form as follows:
 
 ```
-a,b= 3,1
-f(x,y) = (x-b)^2*(x^2 + y^2) - a*x^2
-r = (f == 0)
-cgraph(r)
+## trident of Newton
+c,d,e,h = 1,1,1,1
+f(x,y) = x*y
+g(x,y) = c*x^3 + d*x^2 + e*x + h
+pwgraph(f==g)
 ```
+
+![Newton trident](http://i.imgur.com/1vhqSUz.png)
 
 Or the [Devils curve](http://www-groups.dcs.st-and.ac.uk/~history/Curves/Devils.html)
 
@@ -41,12 +44,21 @@ r = f < g
 cgraph(r, -10, 10, -10, 10, 2^9, 2^9)
 ```
 
+![Inequality](http://i.imgur.com/AqnHLMr.png)
+
 
 The coloring scheme employed follows Tupper:
 
 * white for the predicate `r` definitely not being satisfied for the pixel,
 * black if the predicate is definitely satisfied somewhere in the pixel
 * and red if it is unknown.
+
+This graph indicates the algorithm: break up the picture by regions
+and check if the regions satisfy the predicate. If definitely not,
+paint the region white; if definitely yes, paint the region black;
+else subdive into 4 regions and repeat until subdivision is below the
+pixel level. At which point, check for solutions.
+
 
 ![Batman Curve](http://i.imgur.com/NuOY92b.png)
 
@@ -82,14 +94,9 @@ The above example illustrates a few things:
   "maybe" so a different interpretation of the logical operators is
   given that doesn't lend itself to the more convenient notation.
 
-* rendering can be slow. This picture shows the algorithm: split the
-  domain into intervals. If the statement is `FALSE` color the pixels
-  white, if `TRUE` color them black, if not divide into 4 smaller
-  regions and check again. 
-
-
-
-	For images that require a lot of checking, the graphs can be **really slow** to render.
+* rendering can be slow. For images that require a lot of checking,
+  such as the inequality above, the graphs can be **really slow** to
+  render.
 
 
 

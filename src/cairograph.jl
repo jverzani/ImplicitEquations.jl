@@ -43,7 +43,7 @@ end
 
 
 
-function cgraph(r, L=-5, R=5, B=-5, T=5, W=2^7, H=2^7)
+function cgraph(r, L=-5, R=5, B=-5, T=5, W=2^8, H=2^8)
     c = plot_new(W,H)
     U = GRAPH(r, L, R, B, T, W, H)
 
