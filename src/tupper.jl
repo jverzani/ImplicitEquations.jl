@@ -117,13 +117,13 @@ function check_continuity(r::Pred, u, L, R, B, T, W, H)
         if val == TRUE
             return(val)
         elseif val == FALSE
-            return(val)
+            return(MAYBE)
         end
     end
     ## What to do if fxy.cont !== TRUE...
     ## what to do for a default?
     MAYBE ## Maybe
-    FALSE
+    ##FALSE
 end
 
 ## Return TRUE, FALSE or MAYBE

@@ -3,16 +3,24 @@ isthin(x::Interval) = (m = mid(x); m == x.lo || m == x.hi)
 
 
 ## These are missing in Validated NUmerics
-Base.(:>=)(a::Real, i::Interval) = a >= i.hi
+Base.(:(!==)){T<:Real,S<:Real}(i::Interval{T}, j::Interval{S}) = (i.lo !== j.lo) || (i.hi !== j.hi)
+Base.(:(==)){T<:Real,S<:Real}(i::Interval{T}, j::Interval{S}) = (i.lo == j.lo) && (i.hi == j.hi)
+Base.(:(<=)){T<:Real,S<:Real}(i::Interval{T}, j::Interval{S}) = i.hi <= j.lo
+Base.(:(<=)){T<:Integer, S<:Real}(a::Rational{T},i::Interval{S}) = float(a) <= i
+Base.(:(<=)){T<:Real,S<:Integer}(i::Interval{T}, a::Rational{S}) = a > i
 
-Base.(:<=)(a::Real, i::Interval) = a <= i.lo
-Base.(:<=)(i::Interval, a::Real) = (a >= i)
+            
+      
+Base.(:>=){T<:Real}(a::Real, i::Interval{T}) = a >= i.hi
 
-Base.(:(==))(a::Real, i::Interval)  = (isthin(i) & (a in i))
-Base.(:(==))(i::Interval, a::Real)  = (a == i)
+Base.(:<=){T<:Real}(a::Real, i::Interval{T}) = a <= i.lo
+Base.(:<=){T<:Real}(i::Interval{T}, a::Real) = (a >= i)
 
-Base.(:(!==))(a::Real, i::Interval) = !(a in i)
-Base.(:(!==))(i::Interval, a::Real) = (a !== i)
+Base.(:(==)){T<:Real}(a::Real, i::Interval{T})  = (isthin(i) & (a in i))
+Base.(:(==)){T<:Real}(i::Interval{T}, a::Real)  = (a == i)
+
+Base.(:(!==)){T<:Real}(a::Real, i::Interval{T}) = !(a in i)
+Base.(:(!==)){T<:Real}(i::Interval{T}, a::Real) = (a !== i)
 
 Base.asin(i::Interval) = ValidatedNumerics.Interval(asin(i.lo), asin(i.hi))
 Base.acos(i::Interval) = ValidatedNumerics.Interval(acos(i.lo), acos(i.hi))
@@ -103,9 +111,9 @@ type OInterval
     cont::BInterval
 end
 
-OInterval(a,b) = OInterval(Interval(a,b), BInterval(true,true), BInterval(true,true))
+OInterval(a,b) = OInterval(Interval(float(a),float(b)), BInterval(true,true), BInterval(true,true))
 OInterval(a) = OInterval(a,a)   # thin one..
-Base.convert(::Type{OInterval}, i::Interval) = OInterval(i.lo, i.hi)
+Base.convert(::Type{OInterval}, i::Interval) = OInterval(float(i.lo), float(i.hi))
 
 
 ValidatedNumerics.diam(x::OInterval) = diam(x.val)
@@ -115,6 +123,8 @@ ValidatedNumerics.diam(x::OInterval) = diam(x.val)
 ##  bypass isless...
 ## Need to override functions for OInterval
 Base.isless(i::OInterval, j::OInterval) = isless(i.val, j.val)
+
+
 
 ## Logical values for OIntervals return BIntervals (FALSE, MAYBE, TRUE)
 Base.(:<)(i::OInterval, a::Real) = BInterval(i.val < a, !(i.val >= a))
@@ -251,11 +261,12 @@ Base.exp(x::OInterval) = OInterval(exp(x.val), x.def, x.cont)
 ## discontinous functions
 
 ## /
+## division is slow, as ValidatedNumerics makes it so...
 Base.(:/)(x::Real, y::OInterval) = OInterval(x,x)/y
 Base.(:/)(x::OInterval, y::Real) = OInterval(x.val/y, x.def, x.cont)
 function Base.(:/)(x::OInterval, y::OInterval)
-    ## 0 is the issue
-    if 0 ∈ y.val
+    ## 0 is the issue. 
+    if 0.0 ∈ y.val
         ## maybe defined, maybe continuous
         OInterval(x.val/y.val, x.def & MAYBE, x.cont & MAYBE)
     else
@@ -273,6 +284,7 @@ function Base.log(x::OInterval)
         OInterval(log(x.val), x.def, x.cont)
     end
 end
+Base.log(k::MathConst{:e},x::OInterval) = log(x)
 Base.log(k::Real, x::OInterval) = log(x)/log(k)
 
 ## Powers ^, sqrt, cbrt
@@ -361,7 +373,8 @@ end
 function compute(p::Pred, u::Region, L, R, B, T, W, H)
     
     fxy = compute_fxy(p, u, L, R, B, T, W, H)
-    
+
+    fxy.def == FALSE && return (FALSE)
     ValidatedNumerics.isempty(fxy.val) && return (FALSE & fxy.def)
 
     if p.op === ==

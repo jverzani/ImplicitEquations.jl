@@ -1,7 +1,7 @@
 ## patchwork graph
 
 using Patchwork, Patchwork.SVG
-using ImplicitEquations
+#using ImplicitEquations
 
 
 function pwgraph(r, L=-5, R=5, B=-5, T=5, W=2^8, H=2^8; λ=2)
@@ -30,3 +30,5 @@ function pwgraph(r, L=-5, R=5, B=-5, T=5, W=2^8, H=2^8; λ=2)
 
     svg(cmds..., width=λ*W, height=λ*H)
 end
+
+export pwgraph

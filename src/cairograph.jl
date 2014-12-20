@@ -1,5 +1,5 @@
-using ImplicitEquations
-using Base.Graphics, Cairo, Gtk
+#using ImplicitEquations
+using Base.Graphics, Gtk
 import ValidatedNumerics: diam
 import ImplicitEquations: xy_region
 

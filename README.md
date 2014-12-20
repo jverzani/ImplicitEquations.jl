@@ -17,11 +17,13 @@ For example, the
 can be represented in Cartesian form as follows:
 
 ```
+using ImplicitEquations
+using Winston # for wgraph
 ## trident of Newton
 c,d,e,h = 1,1,1,1
 f(x,y) = x*y
 g(x,y) = c*x^3 + d*x^2 + e*x + h
-pwgraph(f==g)
+wgraph(f==g)
 ```
 
 ![Newton trident](http://i.imgur.com/1vhqSUz.png)
@@ -32,7 +34,7 @@ Or the [Devils curve](http://www-groups.dcs.st-and.ac.uk/~history/Curves/Devils.
 a,b = -1,2
 f(x,y) = y^4 - x^4 + a*y^2 + b*x^2
 r = (f==0)
-cgraph(r)
+pwgraph(r)
 ```
 
 Inequalities can be graphed as well
@@ -41,7 +43,7 @@ Inequalities can be graphed as well
 f(x,y)= (y-5)*cos(4*sqrt((x-4)^2 + y^2))
 g(x,y) = x*sin(2*sqrt(x^2 + y^2))
 r = f < g
-cgraph(r, -10, 10, -10, 10, 2^9, 2^9)
+pwgraph(r, -10, 10, -10, 10, W=2^9, H=2^9)
 ```
 
 ![Inequality](http://i.imgur.com/AqnHLMr.png)
@@ -50,19 +52,18 @@ cgraph(r, -10, 10, -10, 10, 2^9, 2^9)
 The coloring scheme employed follows Tupper:
 
 * white for the predicate `r` definitely not being satisfied for the pixel,
-* black if the predicate is definitely satisfied somewhere in the pixel
+* black if the predicate is definitely satisfied somewhere in the pixel,
 * and red if it is unknown.
 
-This graph indicates the algorithm: break up the picture by regions
+This graph has extra thin lines to indicate the algorithm: break up the picture by regions
 and check if the regions satisfy the predicate. If definitely not,
 paint the region white; if definitely yes, paint the region black;
-else subdive into 4 regions and repeat until subdivision is below the
-pixel level. At which point, check for solutions.
+else subdivide into 4 regions and repeat until subdivision is below
+the pixel level. At which point, check for solutions using a random
+set of points and the intermediate value theorem.
 
 
-![Batman Curve](http://i.imgur.com/NuOY92b.png)
-
-For this
+For the
 [Batman equation](http://yangkidudel.wordpress.com/2011/08/02/love-and-mathematics/)
 we use `screen` to restrict ranges and logical operators to combine
 predicates.
@@ -75,8 +76,11 @@ f3(x,y) = y - (3*abs(x) + 3/4) *       screen((1/2 < abs(x)) & (abs(x) < 3/4))
 f4(x,y) = y - 2.25 *                   screen(abs(x) <= 1/2) 
 f5(x,y) = (6 * sqrt(10)/7 + (1.5-.5 * abs(x)) - 6 * sqrt(10)/14 * sqrt(4-(abs(x)-1)^2) -y) * screen(abs(x) >= 1)
 r = (f==0) | (f1==0) | (f2== 0) | (f3==0) | (f4==0) | (f5==0)
-pwgraph(r)
+wgraph(r)
 ```
+
+
+![Batman Curve](http://i.imgur.com/NuOY92b.png)
 
 
 The above example illustrates a few things:
@@ -94,11 +98,17 @@ The above example illustrates a few things:
   "maybe" so a different interpretation of the logical operators is
   given that doesn't lend itself to the more convenient notation.
 
-* rendering can be slow. For images that require a lot of checking,
-  such as the inequality above, the graphs can be **really slow** to
-  render.
+* rendering can be slow. There are two reasons: images that require a
+  lot of checking, such as the inequality above, are slow just because
+  more regions must be analyzed. As well, some operations are slow,
+  such as division, as adjustments for discontinuities are slow.
 
 
+The graphs can be rendered in different ways. The `asciigraph`
+function is always available and makes a text-based plot. The `wgraph`
+function is loaded withn `Winston` is. The `cgraph` function is loaded
+if `Cairo` is. SVG based solutions, useful in `IJulia`, are for
+`Patchwork` and `Gadfly`, though these must be copy and pasted in.
 
 
 ## TODO
@@ -110,5 +120,5 @@ The above example illustrates a few things:
 * http://www.xamuel.com/graphs-of-implicit-equations/
 * http://www.peda.com/grafeq/gallery.html
 * branch cut tracking
-* increase speed (could color 1-pixel regions better if so, perhaps).
-* work into `Gadfly` and/or `Winston` graphics
+* increase speed (could color 1-pixel regions better if so, perhaps; division checks; type stability).
+* work into `Gadfly` and/or `Winston` graphics. (Started)
