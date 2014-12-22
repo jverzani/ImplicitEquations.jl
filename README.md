@@ -101,14 +101,18 @@ The above example illustrates a few things:
 * rendering can be slow. There are two reasons: images that require a
   lot of checking, such as the inequality above, are slow just because
   more regions must be analyzed. As well, some operations are slow,
-  such as division, as adjustments for discontinuities are slow.
+  such as division, as adjustments for discontinuities are slow. (And
+  by slow, it means really slow. The difference between rendering
+  `(1-x^2)*(2-y^2)` and `csc(1-x^2)*cot(2-y^2)` can be 80 times.)
 
+## Display
 
-The graphs can be rendered in different ways. The `asciigraph`
-function is always available and makes a text-based plot. The `wgraph`
-function is loaded withn `Winston` is. The `cgraph` function is loaded
-if `Cairo` is. SVG based solutions, useful in `IJulia`, are for
-`Patchwork` and `Gadfly`, though these must be copy and pasted in.
+The graphs can be rendered in different ways.
+
+* The `asciigraph` function is always available and makes a text-based plot.
+* The `wgraph` function is loaded withn `Winston` is.
+* The `cgraph` function is loaded when `Cairo` is.
+* SVG based solutions, useful in `IJulia`, are for `Patchwork` and `Gadfly`, though currently these must be copy and pasted in, as there is some issue with the load hooks provided by `Jewel.@require`.
 
 
 ## TODO

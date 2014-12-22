@@ -90,7 +90,7 @@ const MAYBE = BInterval(false, true)
 
 Base.(:&)(x::BInterval, y::BInterval) = BInterval(x.lo & y.lo, x.hi & y.hi)
 Base.(:|)(x::BInterval, y::BInterval) = BInterval(x.lo | y.lo, x.hi | y.hi)
-
+Base.(:!)(x::BInterval) = BInterval(!x.lo, !x.hi)
 
 
 ## ...
@@ -111,7 +111,7 @@ type OInterval
     cont::BInterval
 end
 
-OInterval(a,b) = OInterval(Interval(float(a),float(b)), BInterval(true,true), BInterval(true,true))
+OInterval(a,b) = OInterval(Interval(a,b), BInterval(true,true), BInterval(true,true))
 OInterval(a) = OInterval(a,a)   # thin one..
 Base.convert(::Type{OInterval}, i::Interval) = OInterval(float(i.lo), float(i.hi))
 
@@ -155,9 +155,11 @@ Base.(:(<=))(a::Real, i::OInterval) = i <= a
 
     Also aliased to I_(x>0)
 
-    As an expression like `x::OInterval > 0` is not Boolean, but rather `BInterval`, a simple ternary
-    operator use like `x > 0 ? 1 : NaN` won't work.
-""" ->
+    As an expression like `x::OInterval > 0` is not Boolean, but
+    rather a `BInterval` which allows for a "maybe" state. As such, a
+    simple ternary operator use like `x > 0 ? 1 : NaN` won't work.
+
+    """ ->
 screen(ex) = (ex == FALSE) ? NaN : 1 
 const I_ = screen               # indicator function like!
 
@@ -299,7 +301,8 @@ function Base.(:^)(x::OInterval, n::Integer)
     OInterval(x.val^n, x.def, x.cont)
 end
 
-## XXX this isn't right [-1,1]^(1//3) shouldn't be [0,1]
+## Rational ones can be exact, whereas floating point exponents are not. The main
+## example would be `x^(1/3)` and `x^(1/
 function Base.(:^)(x::OInterval, q::Rational)
     q < 0 && return(1/x^(-q))
     ## clean up odd denominator
@@ -347,8 +350,10 @@ Base.max(x::OInterval, y::OInterval) = OInterval(max(x.val, y.val), x.def & y.de
 Base.min(x::OInterval, y::OInterval) = OInterval(min(x.val, y.val), x.def & y.def, x.cont & y.cont)
     
 
-## others
-
+## others sign, mod, ...
+function Base.sign(x::OInterval)
+    OInterval(sign(x.val), x.def, x.cont & ((x.val.lo < 0 < x.val.hi) ? MAYBE : TRUE))
+end
 
 ## pixels are [0, W) x [0, H) where (0,0) lower left, (W-1, H-1) upper right
 ## we assume reg is of the form [a,b) x [c,d)
@@ -413,16 +418,15 @@ function cross_zero(r::Pred, u::Region, L, R, B, T, W, H)
     n = 10                      # check 10 random points
     λ1s, λ2s = [0.0, 1.0 ,rand(n)], [0.0, 1.0, rand(n)]
     β1s, β2s = [1.0, 0.0, rand(n)], [1.0, 0.0, rand(n)]
-    out = Bool[]
     for i in 1:(n+2)
         rx, ry = x.val.lo + λ1s[i]*dx, y.val.lo + λ2s[i] * dy
         sx, sy = x.val.lo + β1s[i]*dx, y.val.lo + β2s[i] * dy
         ll = OInterval(rx), OInterval(ry)
         ur = OInterval(sx), OInterval(sy)
         val = (r.f(ll...) - r.val) * (r.f(ur...) - r.val)
-        push!(out, ((val <= 0)==TRUE) ? true : false)
+        ((val <= 0)==TRUE) && return(TRUE)
     end
-    return (any(out) ? TRUE : FALSE) # MAYBE leaves red, this turns white via FALSE
+    return(FALSE)
 end
 
 
