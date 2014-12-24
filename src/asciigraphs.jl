@@ -10,19 +10,16 @@ function irange(u, W, H)
 end
 
 function asciigraph(r, L=-5, R=5, B=-5, T=5; W=2^4, H=2^4)
-    U = GRAPH(r, L, R, B, T, W, H)
+    U, black, white = GRAPH(r, L, R, B, T, W, H)
     
     graph = repmat([cols[:red]], H, W)
-
-    for (k, v) in U
-        for u in v[:white]
-            r1, r2 = irange(u, W, H)            
-            graph[r2, r1] = cols[:white]
-        end
-        for u in v[:black]
-            r1, r2 = irange(u, W, H)
-            graph[r2, r1] = cols[:black]
-        end
+    for u in white
+        r1, r2 = irange(u, W, H)
+        graph[r2, r1] = cols[:white]
+    end
+    for u in black
+        r1, r2 = irange(u, W, H)
+        graph[r2, r1] = cols[:black]
     end
     
     mat = graph

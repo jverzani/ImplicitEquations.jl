@@ -56,22 +56,8 @@ Base.ceil(x::Interval) = Interval(ceil(x.lo), ceil(x.hi))
 
 
 
-
-## A region is two intervals..
-type Region
-    x                           # Real
-    y                           # Real
-end
-## this is hacky!!! Remove once debugged XXX
-function Base.string(u::Region)
-    "[$(u.x.val.lo), $(u.x.val.hi)) × [$(u.y.val.lo), $(u.y.val.hi))"
-end
-Base.display(as::Array{Region,1}) = display(map(string, as))        
-call(f::Function, u::Region) = f(u.x, u.y)
-
-
 ## BInterval represents yes (true, true), no (false, false) and maybe (false, true)
-immutable BInterval 
+type BInterval 
     lo :: Bool
     hi :: Bool
 
@@ -91,7 +77,7 @@ const MAYBE = BInterval(false, true)
 Base.(:&)(x::BInterval, y::BInterval) = BInterval(x.lo & y.lo, x.hi & y.hi)
 Base.(:|)(x::BInterval, y::BInterval) = BInterval(x.lo | y.lo, x.hi | y.hi)
 Base.(:!)(x::BInterval) = BInterval(!x.lo, !x.hi)
-
+Base.(:(==))(x::BInterval, y::BInterval) = (x.lo==y.lo)&&(x.hi==y.hi)
 
 ## ...
 function negate_op(op)
@@ -105,8 +91,8 @@ function negate_op(op)
 end
 
 ## OIinterval includes more
-type OInterval
-    val::Interval
+type OInterval{T}
+    val::Interval{T}
     def::BInterval
     cont::BInterval
 end
@@ -114,6 +100,13 @@ end
 OInterval(a,b) = OInterval(Interval(a,b), BInterval(true,true), BInterval(true,true))
 OInterval(a) = OInterval(a,a)   # thin one..
 Base.convert(::Type{OInterval}, i::Interval) = OInterval(float(i.lo), float(i.hi))
+
+## A region is two OIntervals.
+type Region{T}
+    x::OInterval{T}                           # Real
+    y::OInterval{T}                           # Real
+end
+call(f::Function, u::Region) = f(u.x, u.y)
 
 
 ValidatedNumerics.diam(x::OInterval) = diam(x.val)

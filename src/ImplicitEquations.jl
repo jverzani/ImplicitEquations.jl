@@ -35,7 +35,12 @@ Jewel.@require Cairo begin
 end
 
 ## Patchwork doesn't work, as doesn't Gadfly...
-## reload(Pkg.dir("ImplicitEquations", "src", "patchworkgraph.jl"))
+## Fails. Perhaps try reload(Pkg.dir("ImplicitEquations", "src", "patchworkgraph.jl"))
+#Jewel.@require Cairo begin
+#    include(Pkg.dir("ImplicitEquations", "src", "patchworkgraph.jl"))
+#    export pwgraph
+#end
+
 
 
 

@@ -42,71 +42,66 @@ function break_into_squares(W, H)
 end
 
 function GRAPH(r, L, R, B, T, W, H)
-
-
     rects = break_into_squares(W, H)
-    rs = [Region(OInterval(u[1], u[2]), OInterval(u[3], u[4])) for u in rects]
     
-    U = Dict()
+    reds = [Region{Int}(OInterval(u[1], u[2]), OInterval(u[3], u[4])) for u in rects]
+    black = Region{Int}[]
+    white = Region{Int}[]
     
     k = min(ifloor(log2(W)), ifloor(log2(H))) # largest square is size 2^k x 2^k
-    U[k] = [:black=>Region[],
-            :white=>Region[],
-            :red=>rs]
     
-    while (k >= 0) & (length(U[k][:red]) > 0)
-        U[k-1] = RefinePixels(r, U[k], L, R, B, T, W, H)
+    while (k >= 0) & (length(reds) > 0)
+        reds = RefinePixels(r, reds, L, R, B, T, W, H, black, white)
         k = k - 1
     end
 
-    U
+    reds, black, white
 end
 
-function RefinePixels(r, U_k, L, R, B, T, W, H)
-    ## U_k just red, Uk_1 includes black and white
-    Uk_1 = [:black=>Region[], :white=>Region[], :red=>Region[]]
-    for u in U_k[:red]
+function RefinePixels(r, U_k, L, R, B, T, W, H, black, white)
+    ## Uk_1 a refinement of U_k which hold red regions
+    Uk_1 = Region{Int}[]
+    for u in U_k
         out = compute(r, u,  L, R, B, T, W, H)
         if out == TRUE
-            push!(U_k[:black], u)
+            push!(black, u)
         elseif out == FALSE
-            push!(U_k[:white], u)
+            push!(white, u)
         else
             x = u.x.val; y = u.y.val
             dx, dy = diam(x), diam(y)
             if (dx > 1) & (dy > 1)
                 hx = div(dx,2); hy = div(dy,2)
                 for i in 0:1, j in 0:1
-                    uij = Region(OInterval(x.lo + i*hx, x.lo + (i+1)*hx), 
+                    uij = Region{Int}(OInterval(x.lo + i*hx, x.lo + (i+1)*hx), 
                                  OInterval(y.lo + j*hy, y.lo + (j+1)*hy))
-                    push!(Uk_1[:red], uij)
+                    push!(Uk_1, uij)
                 end
             else
                 ## these are red with diameter 1, could be white or black
                 val = check_continuity(r, u, L, R, B, T, W, H)
                 if val == TRUE
-                    push!(U_k[:black], u)
+                    push!(black, u)
                 elseif val == FALSE
-                    push!(U_k[:white], u)
+                    push!(white, u)
                 end
             end
         end
     end
-    U_k[:red] = filter(a -> !(a ∈ union(U_k[:black], U_k[:white])), U_k[:red])
-    
     Uk_1
 end
 
 ## for 1-pixel squares, check NaN and continuity
 ## Return TRUE, FALSE or MAYBE
 function check_continuity(r::Pred, u, L, R, B, T, W, H)
+    
     fxy = compute_fxy(r, u,  L, R, B, T, W, H)
 
     ## check for NaN
     if ValidatedNumerics.isempty(fxy.val)
         return(FALSE)
     end
-    if fxy.def != TRUE
+    if (fxy.def == FALSE) || (fxy.def == MAYBE)
         return(FALSE)
     end
     
@@ -114,10 +109,11 @@ function check_continuity(r::Pred, u, L, R, B, T, W, H)
     if (fxy.cont == TRUE) && ((r.op === ==) || (r.op === <=) || (r.op === >=))
         ## use intermediate value theorem here
         val = cross_zero(r, u, L, R, B, T, W, H)
+        return(val)
         if val == TRUE
             return(val)
         elseif val == FALSE
-            return(MAYBE)
+            return(MAYBE) 
         end
     end
     ## What to do if fxy.cont !== TRUE...

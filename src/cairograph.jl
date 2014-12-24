@@ -30,12 +30,12 @@ function paint_region(ctx, u,  L, R, B, T, W, H, how)
     stroke(ctx)
 end
 
-function show_regions(ctx, r, Us, L, R, B, T, W, H)
+function show_regions(ctx, r, black, white, L, R, B, T, W, H)
     for (k,U) in Us
-        for u in U[:white]
+        for u in white
             paint_region(ctx, u, L, R, B, T, W, H, (1,1,1))
         end
-        for u in U[:black]
+        for u in black
             paint_region(ctx, u, L, R, B, T, W, H, (0,0,0))
         end
     end
@@ -45,12 +45,12 @@ end
 
 function cgraph(r, L=-5, R=5, B=-5, T=5, W=2^8, H=2^8)
     c = plot_new(W,H)
-    U = GRAPH(r, L, R, B, T, W, H)
+    red, black, white = GRAPH(r, L, R, B, T, W, H)
 
     tmp = (c) -> begin
         ctx = getgc(c)
         paint_red(ctx, L, R, B, T, W, H)
-        show_regions(ctx, r, U,  L, R, B, T, W, H)
+        show_regions(ctx, r, black, white,  L, R, B, T, W, H)
     end
     c.draw = tmp
     reveal(c)

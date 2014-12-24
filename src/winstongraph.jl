@@ -36,18 +36,16 @@ A pixel is important, as the graph will color a pixel
 - red if a solution _might_ exist
 
 """ ->
-function wgraph(r, L=-5, R=5, B=-5, T=5; W=2^7, H=2^7, offset::Int=1)
+function wgraph(r, L=-5, R=5, B=-5, T=5; W=2^8, H=2^8, offset::Int=1)
 
-    U = GRAPH(r, L, R, B, T, W, H)
+    red, black, white = GRAPH(r, L, R, B, T, W, H)
     p = FramedPlot()
-    add_rect(p, L+1, R, B, T, cols[:red])
-    for (k,v) in U
-        for u in v[:white]
-            add_rect(p, xyrange(u, L,R,B,T,W,H, offset=offset)..., cols[:white])
-        end
-        for u in v[:black]
-            add_rect(p, xyrange(u, L,R,B,T,W,H, offset=offset)..., cols[:black])
-        end
+    add_rect(p, L+1, R, B+1, T, cols[:red])
+    for u in white
+        add_rect(p, xyrange(u, L,R,B,T,W,H, offset=offset)..., cols[:white])
+    end
+    for u in black
+        add_rect(p, xyrange(u, L,R,B,T,W,H, offset=offset)..., cols[:black])
     end
 
     p

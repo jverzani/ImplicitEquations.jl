@@ -11,17 +11,15 @@ end
 
 function df_graph(r, L=-10, R=10, B=-10, T=10, W=2^8, H=2^7)
 
-    U = GRAPH(r, L, R, B, T, W, H)
+    reds, black, whites = GRAPH(r, L, R, B, T, W, H)
 
     d = DataFrame(x_min=L, x_max=R, y_min=B, y_max=T, col=cols[:red])
     
-    for (k, v) in U
-        for u in v[:white]
-            push!(d, tuple(xyrange(u, L,R,B,T,W,H)..., cols[:white]))
-        end
-        for u in v[:black]
-            push!(d, tuple(xyrange(u, L,R,B,T,W,H)..., col[:black]]))
-        end
+    for u in whites
+        push!(d, tuple(xyrange(u, L,R,B,T,W,H)..., cols[:white]))
+    end
+    for u in blacks
+        push!(d, tuple(xyrange(u, L,R,B,T,W,H)..., col[:black]]))
     end
 
     d

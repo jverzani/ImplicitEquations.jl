@@ -9,7 +9,8 @@ The paper
 details a method for graphing two-dimensional implicit equations and
 inequalities involving two variables. This package gives an
 implementation of the most basic of the paper's algorithms to allow
-the `julia` user to naturally represent and easily render such graphs.
+the `julia` user to naturally represent and easily render graphs of
+implicit functions and equations.
 
 
 For example, the
@@ -34,7 +35,7 @@ Or the [Devils curve](http://www-groups.dcs.st-and.ac.uk/~history/Curves/Devils.
 a,b = -1,2
 f(x,y) = y^4 - x^4 + a*y^2 + b*x^2
 r = (f==0)
-pwgraph(r)
+wgraph(r)
 ```
 
 Inequalities can be graphed as well
@@ -43,7 +44,7 @@ Inequalities can be graphed as well
 f(x,y)= (y-5)*cos(4*sqrt((x-4)^2 + y^2))
 g(x,y) = x*sin(2*sqrt(x^2 + y^2))
 r = f < g
-pwgraph(r, -10, 10, -10, 10, W=2^9, H=2^9)
+wgraph(r, -10, 10, -10, 10, W=2^9, H=2^9)
 ```
 
 ![Inequality](http://i.imgur.com/AqnHLMr.png)
@@ -102,17 +103,20 @@ The above example illustrates a few things:
   lot of checking, such as the inequality above, are slow just because
   more regions must be analyzed. As well, some operations are slow,
   such as division, as adjustments for discontinuities are slow. (And
-  by slow, it means really slow. The difference between rendering
-  `(1-x^2)*(2-y^2)` and `csc(1-x^2)*cot(2-y^2)` can be 80 times.)
+  by slow, it can means really slow. The difference between rendering
+  `(1-x^2)*(2-y^2)` and `csc(1-x^2)*cot(2-y^2)` can be 10 times.)
 
 ## Display
 
 The graphs can be rendered in different ways.
 
 * The `asciigraph` function is always available and makes a text-based plot.
-* The `wgraph` function is loaded withn `Winston` is.
+* The `wgraph` function is loaded when `Winston` is.
 * The `cgraph` function is loaded when `Cairo` is.
-* SVG based solutions, useful in `IJulia`, are for `Patchwork` and `Gadfly`, though currently these must be copy and pasted in, as there is some issue with the load hooks provided by `Jewel.@require`.
+* SVG based solutions, useful in `IJulia`, are for `Patchwork` and
+  `Gadfly`, though currently these must be copy and pasted in, as
+  there is some issue with the load hooks provided by
+  `Jewel.@require`.
 
 
 ## TODO
@@ -120,9 +124,9 @@ The graphs can be rendered in different ways.
 *LOTS*:
 
 * `@doc`
-* integrate plotting routines
+* integrate plotting routines; work into `Gadfly` and `Patchwork`. `Winston` is done.
 * http://www.xamuel.com/graphs-of-implicit-equations/
 * http://www.peda.com/grafeq/gallery.html
 * branch cut tracking
 * increase speed (could color 1-pixel regions better if so, perhaps; division checks; type stability).
-* work into `Gadfly` and/or `Winston` graphics. (Started)
+
