@@ -49,13 +49,14 @@ function GRAPH(r, L, R, B, T, W, H)
     white = Region{Int}[]
     
     k = min(ifloor(log2(W)), ifloor(log2(H))) # largest square is size 2^k x 2^k
-    
+
+    oreds = copy(reds)
     while (k >= 0) & (length(reds) > 0)
+        oreds = copy(reds)
         reds = RefinePixels(r, reds, L, R, B, T, W, H, black, white)
         k = k - 1
     end
-
-    reds, black, white
+    oreds, black, white
 end
 
 function RefinePixels(r, U_k, L, R, B, T, W, H, black, white)

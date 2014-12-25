@@ -1,13 +1,23 @@
 ## patchwork graph
 
 using Patchwork, Patchwork.SVG
-#using ImplicitEquations
+using ImplicitEquations
 
-@doc """
-doc this ...
-""" ->
+"""
+
+Function to graph, using `Patchwork`, a predicate related to a
+two-variable, real-valued function `f`, such as `f == 0`.
+
+Example:
+
+```
+f(x,y) = x^2 + 2y^2
+pwgraph((f >= 2) & (f <= 7))
+```
+"""
 function pwgraph(r, L=-5, R=5, B=-5, T=5, W=2^8, H=2^8; λ=2)
-    red, black, white = GRAPH(r, L, R, B, T, W, H)
+
+    red, black, white = ImplicitEquations.GRAPH(r, L, R, B, T, W, H)
 
 
     function drect(r, col="black")
