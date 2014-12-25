@@ -53,8 +53,7 @@ g(x,y) = c*x^3 + d*x^2 + e*x + h
 wgraph(eq(f,g))       ## aka f ≕ g
 ```
 
-
-![Newton trident](http://i.imgur.com/1vhqSUz.png)
+![Newton trident](http://i.imgur.com/7NxtUsK.png)
 
 
 Inequalities can be graphed as well
