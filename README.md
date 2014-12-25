@@ -26,7 +26,6 @@ wgraph(r)
 ```
 
 ![DevilsCurve](http://i.imgur.com/LChTzC1.png)
-(http://i.imgur.com/jP3kDjN.png)
 
 The function `wgraph` is one of many different means to output a
 graph, in this case using `Winston`.
