@@ -1,6 +1,6 @@
 ## ASCII display
 
-cols = [:red=>".", :white=>" ", :black=>"x"]
+
 
 function irange(u, W, H)
     x, y = u.x.val, u.y.val
@@ -28,8 +28,10 @@ A pixel is important, as the graph will color a pixel
 - red (e.g. ".") if a solution _might_ exist
 
 """ ->
-
 function asciigraph(r, L=-5, R=5, B=-5, T=5; W=2^4, H=2^4)
+
+    cols = [:red=>".", :white=>" ", :black=>"x"]
+    
     red, black, white = GRAPH(r, L, R, B, T, W, H)
     
     graph = repmat([cols[:red]], H, W)

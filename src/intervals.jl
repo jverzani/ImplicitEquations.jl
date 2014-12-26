@@ -238,9 +238,6 @@ function Base.asec(x::OInterval)
         ## XXX not right...
     end
 end
-# Base.csc(x::OInterval) = 1/sin(x)
-# Base.tan(x::OInterval) = sin(x)/cos(x)
-# Base.cot(x::OInterval) = 1/tan(x)
 
 
 Base.asinh(x::OInterval) = log(x + sqrt(1 - x^2))
@@ -366,7 +363,9 @@ function compute_fxy(p::Pred, u::Region, L, R, B, T, W, H)
 end
 
 @doc """
-  compute whether predicate holds in a given region. Returns FALSE, TRUE or MAYBE
+
+  Compute whether predicate holds in a given region. Returns FALSE, TRUE or MAYBE
+
 """ ->
 function compute(p::Pred, u::Region, L, R, B, T, W, H)
     
@@ -382,11 +381,6 @@ function compute(p::Pred, u::Region, L, R, B, T, W, H)
     end
 
     out = p.op(fxy, p.val)
-
-#    out1 = p.op(fxy, p.val)
-#    out2 = negate_op(p.op)(fxy, p.val)
-
-#    out = (out1 != out2 ) ? BInterval(out1, out1) : BInterval(true, false)
 
     ## domain tracking
     out & fxy.def

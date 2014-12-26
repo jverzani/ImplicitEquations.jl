@@ -1,18 +1,18 @@
-## file cor using Winston graphics to display a graph
-using Winston
+using PyPlot
+using Docile
+using ImplicitEquations
 
 linterp(A,B,a,b,W) = (a + A/W*(b-a),a + B/W*(b-a))
 
-function wxyrange(u, L, R, B, T, W, H; offset=1)
-    tuple(linterp(u.x.val.lo, u.x.val.hi + offset, L, R, W)...,
-          linterp(u.y.val.lo, u.y.val.hi + offset, B, T, H)...)
+function pxyrange(u, L, R, B, T, W, H; offset=1)
+    xs = linterp(u.x.val.lo, u.x.val.hi, L, R, W)
+    ys = linterp(u.y.val.lo, u.y.val.hi, B, T, H)
+    xs, ys
 end
     
 
-function add_rect(p, xl,xr,yb,yt,col)
-    x=[xl,xr]
-    y=[0.0, 0.0]
-    Winston.add(p, Winston.FillBetween(x,y+yb,x,y+yt, "color", col))
+function padd_rect(xl, xr,yb,yt,col)
+    fill_between([xl,xr], [0,0]+yb, [0,0]+yt, color=col)
 end
 
 
@@ -35,19 +35,22 @@ A pixel is important, as the graph will color a pixel
 - red if a solution _might_ exist
 
 """ ->
-function wgraph(r, L=-5, R=5, B=-5, T=5; W=2^9, H=2^8, offset::Int=1)
+function pgraph(r, L=-5, R=5, B=-5, T=5; W=2^9, H=2^8, offset::Int=1)
     cols=[:red=>"red", :black=>"black", :white=>"white"]
     
-    red, black, white = GRAPH(r, L, R, B, T, W, H)
-    p = FramedPlot()
-    add_rect(p, L + offset, R, B + offset, T, cols[:red])
+    red, black, white = ImplicitEquations.GRAPH(r, L, R, B, T, W, H)
+
+    clf()
+    p = gcf()
+    axis([L,R,B,T])
+    padd_rect(L, R, B, T, cols[:red])
     for u in white
-        add_rect(p, wxyrange(u, L,R,B,T,W,H, offset=offset)..., cols[:white])
+       xs, ys = pxyrange(u, L,R,B,T,W,H)
+        padd_rect(xs...,ys..., cols[:white])
     end
     for u in black
-        add_rect(p, wxyrange(u, L,R,B,T,W,H, offset=offset)..., cols[:black])
+        xs, ys = pxyrange(u, L,R,B,T,W,H)
+        padd_rect(xs...,ys..., cols[:black])
     end
-
     p
 end
-

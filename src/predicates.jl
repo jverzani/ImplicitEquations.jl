@@ -1,17 +1,20 @@
-
-## extend so that we can have a notation like
+## extend logical operators so that we can have a notation like
 
 #f(x,y) < 0 or f(x,y) == 0
+
+
+abstract Predicate
 
 @doc """
 
 A predicate is defined in terms of a function of two variables, an
 inquality, and either another function or a real number.  For example,
 `f < 0` or `f >= g`. The one case `f==g` is not defined, as it crosses
-up Gadfly. Use `eq(f,g)` instead or `f \eqcolon<tab> g`.
+up `Gadfly` and other code that compares functions for equality. Use
+`eq(f,g)` instead or `f \eqcolon<tab> g`.
 
 """->
-type Pred
+type Pred <: Predicate
     f::Function
     op
     val
@@ -37,8 +40,8 @@ Base.(:>=)(f::Function, g::Function) = Pred((x,y) -> f(x,y) - g(x,y), >= , 0)
 Base.(:>)(f::Function, x::Real) = Pred(f, > , x)
 Base.(:>)(f::Function, g::Function) = Pred((x,y) -> f(x,y) - g(x,y), > , 0)
 
-Base.(:(!==))(f::Function, x::Real) = Pred(f, !== , x)
-Base.(:(!==))(f::Function, g::Function) = Pred((x,y) -> f(x,y) - g(x,y), !== , 0)
+#Base.(:(!==))(f::Function, x::Real) = Pred(f, !== , x)
+#Base.(:(!==))(f::Function, g::Function) = Pred((x,y) -> f(x,y) - g(x,y), !== , 0)
 
 Base.isless(x::Real, f::Function) = (f >= x)
 Base.isless(f::Function, x::Real) = (f < x)
@@ -51,7 +54,7 @@ predicates can be negated with `!`. The parsing rules require the
 individual predicates to be enclosed with parentheses, as in `(f==0) | (g==0)`.
 
 """ ->
-type Preds
+type Preds <: Predicate
     ps
     ops
 end

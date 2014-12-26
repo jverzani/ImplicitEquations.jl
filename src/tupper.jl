@@ -2,6 +2,7 @@
 ## http://www.dgp.toronto.edu/people/mooncake/papers/SIGGRAPH2001_Tupper.pdf
 ## the paper is much more thorough
 
+## Helper function to find initial partition into squares
 function fill_bottom(W,H)
     k = min(ifloor(log2(W)), ifloor(log2(H)))
     rects = Any[]
@@ -41,6 +42,7 @@ function break_into_squares(W, H)
     rects
 end
 
+## Main algorithm of Tupper
 function GRAPH(r, L, R, B, T, W, H)
     rects = break_into_squares(W, H)
     
@@ -59,6 +61,7 @@ function GRAPH(r, L, R, B, T, W, H)
     oreds, black, white
 end
 
+## Refine the region
 function RefinePixels(r, U_k, L, R, B, T, W, H, black, white)
     ## Uk_1 a refinement of U_k which hold red regions
     Uk_1 = Region{Int}[]
@@ -123,7 +126,7 @@ function check_continuity(r::Pred, u, L, R, B, T, W, H)
     ##FALSE
 end
 
-## Return TRUE, FALSE or MAYBE
+## Return TRUE, FALSE or MAYBE for predicates
 function check_continuity(rs::Preds, u, L, R, B, T, W, H)
     vals = map(r -> check_continuity(r, u, L, R, B, T, W, H), rs.ps)
     val = shift!(vals)

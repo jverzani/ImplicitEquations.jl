@@ -42,8 +42,12 @@ function show_regions(ctx, r, black, white, L, R, B, T, W, H)
 end
 
 
+@doc """
 
-function cgraph(r, L=-5, R=5, B=-5, T=5, W=2^8, H=2^8)
+Graphing routine for plain `Cairo` usage
+
+""" ->
+function cgraph(c, r, L=-5, R=5, B=-5, T=5; W=2^8, H=2^8)
     c = plot_new(W,H)
     red, black, white = GRAPH(r, L, R, B, T, W, H)
 
@@ -54,5 +58,10 @@ function cgraph(r, L=-5, R=5, B=-5, T=5, W=2^8, H=2^8)
     end
     c.draw = tmp
     reveal(c)
-    U
+end
+
+function cgraph(r, L=-5, R=5, B=-5, T=5; W=2^8, H=2^8)
+    c = plot_new(W,H)
+    cgraph(c, r, L, R, B, T, W=W, H=H)
+    c
 end

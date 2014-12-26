@@ -1,7 +1,8 @@
 ## patchwork graph
 
-using Patchwork, Patchwork.SVG
+using Patchwork, Patchwork.SVG ## Must load these first!
 using ImplicitEquations
+using Docile
 
 """
 
@@ -14,8 +15,13 @@ Example:
 f(x,y) = x^2 + 2y^2
 pwgraph((f >= 2) & (f <= 7))
 ```
+
+Set `offset=0` to see squares comprising algorithm.
+
+Can pass in additional patchwork commands via additional argument. 
+
 """
-function pwgraph(r, L=-5, R=5, B=-5, T=5, W=2^8, H=2^8; λ=2)
+function pwgraph(r, L=-5, R=5, B=-5, T=5, pwcmds...; W=2^8, H=2^8, λ=2, offset=1)
 
     red, black, white = ImplicitEquations.GRAPH(r, L, R, B, T, W, H)
 
@@ -23,8 +29,8 @@ function pwgraph(r, L=-5, R=5, B=-5, T=5, W=2^8, H=2^8; λ=2)
     function drect(r, col="black")
         width, height = ValidatedNumerics.diam(r.x.val), ValidatedNumerics.diam(r.y.val)
         rect(x=λ*r.x.val.lo, y = λ*(H - width - r.y.val.lo),
-        width = λ*width,
-        height = λ*height,
+        width = λ*width+offset,
+        height = λ*height+offset,
              fill=col)
     end
 
@@ -38,6 +44,10 @@ function pwgraph(r, L=-5, R=5, B=-5, T=5, W=2^8, H=2^8; λ=2)
         push!(cmds, drect(u, "white"))
     end
 
+    for cmd in pwcmds
+        push!(cmds, cmd)
+    end
+    
     svg(cmds..., width=λ*W, height=λ*H)
 end
 
