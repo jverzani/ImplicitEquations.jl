@@ -214,6 +214,7 @@ function Base.asin(x::OInterval)
         OInterval(asin(x.val), x.def, x.cont)
     end
 end
+Base.acsc(x::OInterval) = asin(1/x)
 
 function Base.acos(x::OInterval)
     if x.val.lo > 1.0 || x.val.hi < -1.0
@@ -228,21 +229,16 @@ function Base.acos(x::OInterval)
         OInterval(acos(x.val), x.def, x.cont)
     end
 end
+Base.asec(x::OInterval) = acos(1/x)
 
-function Base.asec(x::OInterval)
-    if x < -1
-        OInterval(pi + asin(sqrt(x^2 - 1)/x), x.def, x.cont)
-    elseif x > 1
-        OInterval(asin(sqrt(x^2 - 1) / x), x.def, x.cont)
-    else
-        ## XXX not right...
-    end
-end
+Base.atan(x::OInterval) = OInterval(atan(x.val), x.def, x.cont)
+Base.acot(x::OInterval) = OInterval(acot(x.val), x.def, x.cont)
+
 
 
 Base.asinh(x::OInterval) = log(x + sqrt(1 - x^2))
 Base.acosh(x::OInterval) = log(x + sqrt(x + 1)*sqrt(x - 1))
-##Base.atanh(x::OInterval) = sinh(x)/cosh(x)
+Base.atanh(x::OInterval) = 1/2*(log(1+x) - log(1-x))
 Base.asech(x::OInterval) = acosh(1/x)
 Base.acsch(x::OInterval) = asinh(1/x)
 Base.acoth(x::OInterval) = atanh(1/x)

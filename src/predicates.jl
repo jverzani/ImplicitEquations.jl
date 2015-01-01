@@ -11,7 +11,7 @@ A predicate is defined in terms of a function of two variables, an
 inquality, and either another function or a real number.  For example,
 `f < 0` or `f >= g`. The one case `f==g` is not defined, as it crosses
 up `Gadfly` and other code that compares functions for equality. Use
-`eq(f,g)` instead or `f \eqcolon<tab> g`.
+`eq(f,g)` instead or `f \Equal<tab> g`.
 
 """->
 type Pred <: Predicate
@@ -31,7 +31,7 @@ Base.(:(==))(f::Function, x::Real) = Pred(f, == , x)
 ## ==(f::Function, g::Function) this crosses up Gadfly and others so...
 eq(f::Function, g::Function) = Pred((x,y) -> f(x,y) - g(x,y), == , 0)
 ## unicode variant
-≕(f::Function, g::Function) = eq(f,g)
+⩵(f::Function, g::Function) = eq(f,g)
 
 
 Base.(:>=)(f::Function, x::Real) = Pred(f, >= , x)

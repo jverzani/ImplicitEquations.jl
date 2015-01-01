@@ -34,19 +34,23 @@ function asciigraph(r, L=-5, R=5, B=-5, T=5; W=2^4, H=2^4)
     
     red, black, white = GRAPH(r, L, R, B, T, W, H)
     
-    graph = repmat([cols[:red]], H, W)
+    graph = repmat([:red], H, W)
     for u in white
         r1, r2 = irange(u, W, H)
-        graph[r2, r1] = cols[:white]
+        graph[r2, r1] = :white
     end
     for u in black
         r1, r2 = irange(u, W, H)
-        graph[r2, r1] = cols[:black]
+        graph[r2, r1] = :black
     end
     
     mat = graph
-    for i in 1:size(mat,1)
-        println(join(mat[i,:]))
+    m,n = size(mat)
+    for i in 1:m
+        for j in 1:n
+            print(cols[mat[i,j]])
+        end
+        print("\n")
     end
 end
             
