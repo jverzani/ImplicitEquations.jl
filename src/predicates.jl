@@ -30,8 +30,23 @@ Base.(:<=)(f::Function, g::Function) = Pred((x,y) -> f(x,y) - g(x,y), <= , 0)
 Base.(:(==))(f::Function, x::Real) = Pred(f, == , x)
 ## ==(f::Function, g::Function) this crosses up Gadfly and others so...
 eq(f::Function, g::Function) = Pred((x,y) -> f(x,y) - g(x,y), == , 0)
-## unicode variant
+## unicode variants
+⩵(f::Function, x::Real) =  f == x
 ⩵(f::Function, g::Function) = eq(f,g)
+
+
+Base.(:(!=))(f::Function, x::Real) = Pred(f, != , x)
+neq(f::Function, g::Function) = Pred((x,y) -> f(x,y) - g(x,y), != , 0)
+
+≶(x::Real, y::Real) = (x != y)
+≶(f::Function, x::Real) = (f != x)
+≶(f::Function, g::Function) = neq(f, g)
+
+≷(x::Real, y::Real) = (x != y)
+≷(f::Function, x::Real) = (f != x)
+≷(f::Function, g::Function) = neq(f, g)
+
+
 
 
 Base.(:>=)(f::Function, x::Real) = Pred(f, >= , x)
@@ -39,9 +54,6 @@ Base.(:>=)(f::Function, g::Function) = Pred((x,y) -> f(x,y) - g(x,y), >= , 0)
 
 Base.(:>)(f::Function, x::Real) = Pred(f, > , x)
 Base.(:>)(f::Function, g::Function) = Pred((x,y) -> f(x,y) - g(x,y), > , 0)
-
-#Base.(:(!==))(f::Function, x::Real) = Pred(f, !== , x)
-#Base.(:(!==))(f::Function, g::Function) = Pred((x,y) -> f(x,y) - g(x,y), !== , 0)
 
 Base.isless(x::Real, f::Function) = (f >= x)
 Base.isless(f::Function, x::Real) = (f < x)

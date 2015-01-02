@@ -17,7 +17,7 @@ include("tupper.jl")
 include("asciigraphs.jl")
 
 
-export eq, ⩵
+export eq, ⩵, ≶, ≷
 export screen, I_
 export asciigraph
 
@@ -33,10 +33,11 @@ Jewel.@require Winston begin
     export wgraph
 end
 
-Jewel.@require Cairo begin
-    include(Pkg.dir("ImplicitEquations", "src", "cairograph.jl"))
-    export cgraph
-end
+## This has an issue, as we assume Gtk here, but Winston may load with Tk...
+# Jewel.@require Cairo begin
+#     include(Pkg.dir("ImplicitEquations", "src", "cairograph.jl"))
+#     export cgraph
+# end
 
 Jewel.@require PyPlot begin
     include(Pkg.dir("ImplicitEquations", "src", "pyplotgraph.jl"))

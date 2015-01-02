@@ -109,17 +109,21 @@ function check_continuity(r::Pred, u, L, R, B, T, W, H)
         return(FALSE)
     end
     
-    ## now check continuity, could sample more points. This just does lower left, upper right
-    if (fxy.cont == TRUE) && ((r.op === ==) || (r.op === <=) || (r.op === >=))
+    ## now check continuity, 
+    if (fxy.cont == TRUE) && ((r.op === ==) || (r.op === eq) || (r.op === ⩵) || (r.op === <=) || (r.op === >=))
         ## use intermediate value theorem here
         val = cross_zero(r, u, L, R, B, T, W, H)
         return(val)
-        if val == TRUE
-            return(val)
-        elseif val == FALSE
-            return(MAYBE) 
-        end
     end
+
+    ## Now check for inequalities
+    ineqs = [<, <= , ≤, ≶, ≷, ≥, >=, >]
+    if (fxy.def == TRUE) && any([r.op === op for op in ineqs])
+        ## just check points
+        val = check_inequality(r, u, L, R, B, T, W, H)
+        return(val)
+    end
+
     ## What to do if fxy.cont !== TRUE...
     ## what to do for a default?
     MAYBE ## Maybe

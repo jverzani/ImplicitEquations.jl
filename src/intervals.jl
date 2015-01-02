@@ -393,12 +393,19 @@ function compute(ps::Preds, u::Region, L, R, B, T, W, H)
     val
 end
 
-@doc "Does this function have a zero crossing? Heuristic check" ->
+@doc """
+
+Does this function have a zero crossing? Heuristic check.
+
+We return `TRUE` or `FALSE` here though `MAYBE` is more apt for the `FALSE` case. However, that 
+leaves some functions showing too much red in the case where there is no zero.
+
+""" ->
 function cross_zero(r::Pred, u::Region, L, R, B, T, W, H)
     x, y = xy_region(u, L, R, B, T, W, H)
     dx, dy = diam(x), diam(y)
     
-    n = 10                      # check 10 random points
+    n = 20                      # number of random points chosen
     λ1s, λ2s = [0.0, 1.0 ,rand(n)], [0.0, 1.0, rand(n)]
     β1s, β2s = [1.0, 0.0, rand(n)], [1.0, 0.0, rand(n)]
     for i in 1:(n+2)
@@ -409,8 +416,22 @@ function cross_zero(r::Pred, u::Region, L, R, B, T, W, H)
         val = (r.f(ll...) - r.val) * (r.f(ur...) - r.val)
         ((val <= 0)==TRUE) && return(TRUE)
     end
-    return(FALSE)
+    return(FALSE)               # MAYBE is more apt, but this gives better graphs in most cases
 end
 
 
-
+@doc "Does this function have a value in the pixel satisfying the inequality? Return `TRUE` or `MAYBE`." ->
+function check_inequality(r::Pred, u::Region, L, R, B, T, W, H)
+    x, y = xy_region(u, L, R, B, T, W, H)
+    dx, dy = diam(x), diam(y)
+    # check 10 random points, here fxy.def == TRUE so we can evaluate function
+    n = 10
+    λ1s, λ2s = [0.0, 1.0 ,rand(n)], [0.0, 1.0, rand(n)]
+    for i in 1:n
+        rx, ry = x.val.lo + λ1s[i]*dx, y.val.lo + λ2s[i] * dy
+        if r.op(r.f(rx,ry), r.val)
+            return(TRUE)
+        end
+    end
+    return(MAYBE)
+end
