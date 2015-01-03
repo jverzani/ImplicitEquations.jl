@@ -416,7 +416,7 @@ function cross_zero(r::Pred, u::Region, L, R, B, T, W, H)
         val = (r.f(ll...) - r.val) * (r.f(ur...) - r.val)
         ((val <= 0)==TRUE) && return(TRUE)
     end
-    return(FALSE)               # MAYBE is more apt, but this gives better graphs in most cases
+    return(MAYBE)              
 end
 
 

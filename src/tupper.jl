@@ -109,25 +109,31 @@ function check_continuity(r::Pred, u, L, R, B, T, W, H)
         return(FALSE)
     end
     
-    ## now check continuity, 
+    ## now check continuity,
+    val = FALSE
     if (fxy.cont == TRUE) && ((r.op === ==) || (r.op === eq) || (r.op === ⩵) || (r.op === <=) || (r.op === >=))
         ## use intermediate value theorem here
-        val = cross_zero(r, u, L, R, B, T, W, H)
-        return(val)
+        val = val | cross_zero(r, u, L, R, B, T, W, H)
+        
     end
 
     ## Now check for inequalities
     ineqs = [<, <= , ≤, ≶, ≷, ≥, >=, >]
     if (fxy.def == TRUE) && any([r.op === op for op in ineqs])
         ## just check points
-        val = check_inequality(r, u, L, R, B, T, W, H)
-        return(val)
+        val = val | check_inequality(r, u, L, R, B, T, W, H)
     end
 
     ## What to do if fxy.cont !== TRUE...
-    ## what to do for a default?
-    MAYBE ## Maybe
-    ##FALSE
+    ## XXX what to do for a default? XXX
+    ## MAYBE is a better choice --leaving red for pixels we can't determine, but
+    ## FALSE makes better looking graphs.
+    default = FALSE
+    if val == MAYBE
+        return(default)
+    else
+        return(val)
+    end
 end
 
 ## Return TRUE, FALSE or MAYBE for predicates

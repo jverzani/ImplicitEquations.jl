@@ -21,7 +21,7 @@ Set `offset=0` to see squares comprising algorithm.
 Can pass in additional patchwork commands via additional argument. 
 
 """
-function pwgraph(r, L=-5, R=5, B=-5, T=5, pwcmds...; W=2^8, H=2^8, λ=2, offset=1)
+function pwgraph(r, L=-5, R=5, B=-5, T=5, pwcmds...; W=2^8, H=2^7, λ=2, offset=1)
 
     red, black, white = ImplicitEquations.GRAPH(r, L, R, B, T, W, H)
 

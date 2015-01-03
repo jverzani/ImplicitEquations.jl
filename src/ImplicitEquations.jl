@@ -17,7 +17,7 @@ include("tupper.jl")
 include("asciigraphs.jl")
 
 
-export eq, ⩵, ≶, ≷
+export eq, neq, ⩵, ≶, ≷
 export screen, I_
 export asciigraph
 
@@ -33,11 +33,6 @@ Jewel.@require Winston begin
     export wgraph
 end
 
-## This has an issue, as we assume Gtk here, but Winston may load with Tk...
-# Jewel.@require Cairo begin
-#     include(Pkg.dir("ImplicitEquations", "src", "cairograph.jl"))
-#     export cgraph
-# end
 
 Jewel.@require PyPlot begin
     include(Pkg.dir("ImplicitEquations", "src", "pyplotgraph.jl"))
@@ -46,6 +41,12 @@ Jewel.@require PyPlot begin
     export pgraph
 end
 
+## These have issues
+## This has an issue, as we assume Gtk here, but Winston may load with Tk...
+# Jewel.@require Cairo begin
+#     include(Pkg.dir("ImplicitEquations", "src", "cairograph.jl"))
+#     export cgraph
+# end
 
 ## Gadfly and Patchwork fail to work with the @require macro
 ## To use them, copy and paste the files into a session. The order of
@@ -66,6 +67,22 @@ end
 #    export pwgraph
 #end
 
+## So we try this trick which requires that the packages be loaded *before* ImplicitEquations
+if :Gadfly in names(Main)
+    include(Pkg.dir("ImplicitEquations", "src", "gadflygraph.jl"))
+    import Gadfly: plot
+    plot(p::Predicate, args...;kwargs...) = ggraph(p, args...; kwargs...)
+    export ggraph
+end
+if :Patchwork in names(Main)
+    using Patchwork.SVG
+    include(Pkg.dir("ImplicitEquations", "src", "patchworkgraph.jl"))
+    export pwgraph
+end
+if :Cairo in names(Main)
+    include(Pkg.dir("ImplicitEquations", "src", "cairograph.jl"))
+    export cgraph
+end
 
 
 

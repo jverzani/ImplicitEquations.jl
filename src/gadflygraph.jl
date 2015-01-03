@@ -40,6 +40,6 @@ function ggraph(r, L=-5, R=5, B=-5, T=5; W=2^8, H=2^7)
     
     d = df_graph(r, L, R, B, T, W, W)
     
-    Gadfly.plot(d, x_min=:x_min, x_max=:x_max, y_min=:y_min, y_max=:y_max,color=:col, Geom.rectbin)
+    Gadfly.plot(d, x_min=:x_min, x_max=:x_max, y_min=:y_min, y_max=:y_max, color=:col, Geom.rectbin)
 end
     
