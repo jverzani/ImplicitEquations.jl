@@ -192,6 +192,14 @@ or after `ImplicitEquations` is loaded). _However_, for `Gadfly`,
 `Patchwork`, and `Cairo` these must be loaded **prior** to loading
 `ImplicitEquations`, as there is some issue with the `@require` macro.
 
+## Alternates
+
+Many plots are simply a single level of a contour plot. Contour plots
+can be drawn with the help of the `Contour.jl` package. They are
+implemented directly in `Gadfly`.
+
+The `SymPy` package exposes SymPy's `plot_implicit` feature that will
+implicitly plot a symbolic expression in 2 variables including inequalities.
 
 ## TODO
 
