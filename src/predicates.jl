@@ -18,7 +18,7 @@ Available operations to produce predicates:
 * `<`
 * `<=`, `≤` (`\le<tab>`)
 * `==` (`Function == Real`), `eq(f,g)`, `⩵` (`\Equal<tab>`)
-* `!==` (`Function != Real`), `neq(f,g)`, `≠` (`\ne<tab>`)
+* `!==` (`Function != Real`), `neq(f,g)`, `≷` (`\gtrless<tab>`), `≶` (`\lessgtr<tab>`)
 * `>=`, `≥` (`\ge<tab>`)
 * `>`
 
@@ -51,14 +51,15 @@ eq(f::Function, g::Function) = Pred((x,y) -> f(x,y) - g(x,y), == , 0)
 Base.(:(!=))(f::Function, x::Real) = Pred(f, != , x)
 neq(f::Function, g::Function) = Pred((x,y) -> f(x,y) - g(x,y), != , 0)
 
-Base.≠(x::Real, y::Real) = (x != y)
-Base.≠(f::Function, x::Real) = (f != x)
-Base.≠(f::Function, g::Function) = neq(f, g)
+≶(x::Real, y::Real) = (x != y)
+≶(f::Function, x::Real) = (f != x)
+≶(f::Function, g::Function) = neq(f, g)
+
+≷(x::Real, y::Real) = (x != y)
+≷(f::Function, x::Real) = (f != x)
+≷(f::Function, g::Function) = neq(f, g)
 
 
-Base.≠(x::Real, y::Real) = (x != y)
-Base.≠(f::Function, x::Real) = (f != x)
-Base.≠(f::Function, g::Function) = neq(f, g)
 
 
 

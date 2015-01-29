@@ -18,7 +18,7 @@ include("tupper.jl")
 include("asciigraphs.jl")
 
 
-export eq, neq, ⩵, ≶, ≷
+export eq, neq, ⩵, ≷, ≶
 export screen, I_
 export asciigraph
 
