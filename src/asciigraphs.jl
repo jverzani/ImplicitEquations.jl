@@ -10,7 +10,7 @@ function irange(u, W, H)
 end
 
 
-@doc """ 
+""" 
 
 Function to graph, using ascii characters, a predicate related to a
 two-dimensional equation, such as `f == 0` or `f < g`, where `f` and
@@ -27,7 +27,7 @@ A pixel is important, as the graph will color a pixel
 - "black" (e.g., "x") if a solution is known to exist in the region
 - red (e.g. ".") if a solution _might_ exist
 
-""" ->
+"""
 function asciigraph(r, L=-5, R=5, B=-5, T=5; W=2^4, H=2^4)
 
     cols = [:red=>".", :white=>" ", :black=>"x"]

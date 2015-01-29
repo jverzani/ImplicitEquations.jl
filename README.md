@@ -185,12 +185,11 @@ The graphs can be rendered in different ways.
 * For rendering with `Cairo` and `Gtk`, a function `cgraph` is exported, but no `plot` method is introduced
 * For rendering with `Patchwork`, the `pwgraph` function is exported, but no `plot` method is introduced
 
-
-This package uses `Jewel.@require` to load modules. This means for
-`Winston` and `PyPlot`, the packages can be loaded at any time (before
-or after `ImplicitEquations` is loaded). _However_, for `Gadfly`,
-`Patchwork`, and `Cairo` these must be loaded **prior** to loading
-`ImplicitEquations`, as there is some issue with the `@require` macro.
+This packages borrows the `Jewel.@require` macro to conditionally load
+modules. Except for `Cairo`, the plotting packages can be loaded
+before or after `ImplicitEquations`. For `Cairo`, the package must be
+loaded prior, as otherwise a conflict between `Tk` and `Gtk` can
+arise.
 
 ## Alternatives
 

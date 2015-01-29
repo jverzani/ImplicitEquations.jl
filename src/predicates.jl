@@ -5,7 +5,7 @@
 
 abstract Predicate
 
-@doc """
+"""
 
 A predicate is defined in terms of a function of two variables, an
 inquality, and either another function or a real number.  For example,
@@ -13,7 +13,20 @@ inquality, and either another function or a real number.  For example,
 up `Gadfly` and other code that compares functions for equality. Use
 `eq(f,g)` instead or `f \Equal<tab> g`.
 
-"""->
+Available operations to produce predicates:
+
+* `<`
+* `<=`, `≤` (`\le<tab>`)
+* `==` (`Function == Real`), `eq(f,g)`, `⩵` (`\Equal<tab>`)
+* `!==` (`Function != Real`), `neq(f,g)`, `≠` (`\ne<tab>`)
+* `>=`, `≥` (`\ge<tab>`)
+* `>`
+
+To combine predicates, `&` and `|` can be used.
+
+To negate a predicate, `!` is used.
+
+"""
 type Pred <: Predicate
     f::Function
     op
@@ -38,13 +51,14 @@ eq(f::Function, g::Function) = Pred((x,y) -> f(x,y) - g(x,y), == , 0)
 Base.(:(!=))(f::Function, x::Real) = Pred(f, != , x)
 neq(f::Function, g::Function) = Pred((x,y) -> f(x,y) - g(x,y), != , 0)
 
-≶(x::Real, y::Real) = (x != y)
-≶(f::Function, x::Real) = (f != x)
-≶(f::Function, g::Function) = neq(f, g)
+Base.≠(x::Real, y::Real) = (x != y)
+Base.≠(f::Function, x::Real) = (f != x)
+Base.≠(f::Function, g::Function) = neq(f, g)
 
-≷(x::Real, y::Real) = (x != y)
-≷(f::Function, x::Real) = (f != x)
-≷(f::Function, g::Function) = neq(f, g)
+
+Base.≠(x::Real, y::Real) = (x != y)
+Base.≠(f::Function, x::Real) = (f != x)
+Base.≠(f::Function, g::Function) = neq(f, g)
 
 
 
@@ -59,13 +73,13 @@ Base.isless(x::Real, f::Function) = (f >= x)
 Base.isless(f::Function, x::Real) = (f < x)
 
 
-@doc """
+"""
 
 Predicates can be joined together with either `&` or `|`. Individual
 predicates can be negated with `!`. The parsing rules require the
 individual predicates to be enclosed with parentheses, as in `(f==0) | (g==0)`.
 
-""" ->
+"""
 type Preds <: Predicate
     ps
     ops

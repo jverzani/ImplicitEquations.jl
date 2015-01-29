@@ -142,17 +142,18 @@ Base.(:(>))(i::OInterval, a::Real) = BInterval(i.val > a, !(i.val <= a))
 Base.(:(<=))(a::Real, i::OInterval) = i <= a
 
 
-@doc """
-    Screen a value using `NaN` values.
-    Use as  with `f(x,y) = x*y * screen(x > 0)`
+"""
 
-    Also aliased to I_(x>0)
+Screen a value using `NaN` values.
+Use as  with `f(x,y) = x*y * screen(x > 0)`
 
-    As an expression like `x::OInterval > 0` is not Boolean, but
-    rather a `BInterval` which allows for a "maybe" state. As such, a
-    simple ternary operator use like `x > 0 ? 1 : NaN` won't work.
+Also aliased to I_(x>0)
 
-    """ ->
+As an expression like `x::OInterval > 0` is not Boolean, but
+rather a `BInterval` which allows for a "maybe" state. As such, a
+simple ternary operator use like `x > 0 ? 1 : NaN` won't work.
+
+"""
 screen(ex) = (ex == FALSE) ? NaN : 1 
 const I_ = screen               # indicator function like!
 
@@ -358,11 +359,11 @@ function compute_fxy(p::Pred, u::Region, L, R, B, T, W, H)
     p.f(x, y)
 end
 
-@doc """
+"""
 
-  Compute whether predicate holds in a given region. Returns FALSE, TRUE or MAYBE
+Compute whether predicate holds in a given region. Returns FALSE, TRUE or MAYBE
 
-""" ->
+"""
 function compute(p::Pred, u::Region, L, R, B, T, W, H)
     
     fxy = compute_fxy(p, u, L, R, B, T, W, H)
@@ -393,14 +394,14 @@ function compute(ps::Preds, u::Region, L, R, B, T, W, H)
     val
 end
 
-@doc """
+"""
 
 Does this function have a zero crossing? Heuristic check.
 
 We return `TRUE` or `FALSE` here though `MAYBE` is more apt for the `FALSE` case. However, that 
 leaves some functions showing too much red in the case where there is no zero.
 
-""" ->
+"""
 function cross_zero(r::Pred, u::Region, L, R, B, T, W, H)
     x, y = xy_region(u, L, R, B, T, W, H)
     dx, dy = diam(x), diam(y)
@@ -420,7 +421,11 @@ function cross_zero(r::Pred, u::Region, L, R, B, T, W, H)
 end
 
 
-@doc "Does this function have a value in the pixel satisfying the inequality? Return `TRUE` or `MAYBE`." ->
+"
+
+Does this function have a value in the pixel satisfying the inequality? Return `TRUE` or `MAYBE`.
+
+"
 function check_inequality(r::Pred, u::Region, L, R, B, T, W, H)
     x, y = xy_region(u, L, R, B, T, W, H)
     dx, dy = diam(x), diam(y)
