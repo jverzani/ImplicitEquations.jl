@@ -4,8 +4,8 @@
 
 function irange(u, W, H)
     x, y = u.x.val, u.y.val
-    rx = (1 + itrunc(x.lo)):(1 + itrunc(x.hi) - 1)
-    ry = (1 + H - itrunc(y.hi)):(1 + H - itrunc(y.lo) - 1)
+    rx = (1 + trunc(Integer, x.lo)):(1 + trunc(Integer, x.hi) - 1)
+    ry = (1 + H - trunc(Integer, y.hi)):(1 + H - trunc(Integer, y.lo) - 1)
     rx, ry
 end
 
@@ -30,7 +30,8 @@ A pixel is important, as the graph will color a pixel
 """
 function asciigraph(r, L=-5, R=5, B=-5, T=5; W=2^4, H=2^4)
 
-    cols = [:red=>".", :white=>" ", :black=>"x"]
+    cols = Dict()
+    cols[:red]="."; cols[:white]=" ";cols[:black]="x"
     
     red, black, white = GRAPH(r, L, R, B, T, W, H)
     

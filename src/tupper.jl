@@ -4,7 +4,7 @@
 
 ## Helper function to find initial partition into squares
 function fill_bottom(W,H)
-    k = min(ifloor(log2(W)), ifloor(log2(H)))
+    k = min(floor(Integer,log2(W)), floor(Integer, log2(H)))
     rects = Any[]
 
     ## fill in
@@ -50,7 +50,7 @@ function GRAPH(r, L, R, B, T, W, H)
     black = Region{Int}[]
     white = Region{Int}[]
     
-    k = min(ifloor(log2(W)), ifloor(log2(H))) # largest square is size 2^k x 2^k
+    k = min(floor(Integer,log2(W)), floor(Integer,log2(H))) # largest square is size 2^k x 2^k
 
     oreds = copy(reds)
     while (k >= 0) & (length(reds) > 0)

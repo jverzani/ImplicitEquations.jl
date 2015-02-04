@@ -16,6 +16,8 @@ Base.(:>=){T<:Real}(a::Real, i::Interval{T}) = a >= i.hi
 Base.(:<=){T<:Real}(a::Real, i::Interval{T}) = a <= i.lo
 Base.(:<=){T<:Real}(i::Interval{T}, a::Real) = (a >= i)
 
+Base.(:(==)){T<:Real}(a::MathConst,b::ValidatedNumerics.Interval{T}) = ==(float(a), b)
+Base.(:(==)){T<:Real}(a::ValidatedNumerics.Interval{T}, b::MathConst) = ==(a, float(b))
 Base.(:(==)){T<:Real}(a::Real, i::Interval{T})  = (isthin(i) & (a in i))
 Base.(:(==)){T<:Real}(i::Interval{T}, a::Real)  = (a == i)
 
