@@ -11,15 +11,16 @@ end
 
 
 function df_graph(r, L=-5, R=5, B=-5, T=5, W=2^8, H=2^7)
-    ## Not sure why these colors don't work now...
-    #cols=[:red=>color("red"), :black=>color("black"), :white=>color("white")]
 
     cols=[:red=>"red", :black=>"black", :white=>"white"]
     
     reds, blacks, whites = ImplicitEquations.GRAPH(r, L, R, B, T, W, H)
 
-    d = DataFrames.DataFrame(x_min=float(L), x_max=float(R), y_min=float(B), y_max=float(T), col=cols[:red])
+    d = DataFrames.DataFrame(x_min=float(L), x_max=float(R), y_min=float(B), y_max=float(T), col=cols[:white])
 
+    for u in reds
+        push!(d, tuple(gxyrange(u, L,R,B,T,W,H)..., cols[:red]))
+    end
     for u in whites
         push!(d, tuple(gxyrange(u, L,R,B,T,W,H)..., cols[:white]))
     end
@@ -39,7 +40,10 @@ How to add a layer???
 function ggraph(r, L=-5, R=5, B=-5, T=5; W=2^8, H=2^7)
     
     d = df_graph(r, L, R, B, T, W, W)
-    
-    Gadfly.plot(d, x_min=:x_min, x_max=:x_max, y_min=:y_min, y_max=:y_max, color=:col, Geom.rectbin)
+
+    ## use layers so that themed colors can be chosen.
+    layers = [layer(sd, x_min=:x_min, x_max=:x_max, y_min=:y_min, y_max=:y_max,
+                    Theme(default_color=color(sd[1,:col])), Geom.rectbin) for sd in groupby(d,:col)]
+    Gadfly.plot(layers...)
 end
     

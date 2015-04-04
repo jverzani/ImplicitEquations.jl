@@ -45,7 +45,7 @@ end
 @require Gadfly begin
     include(Pkg.dir("ImplicitEquations", "src", "gadflygraph.jl"))
     import Gadfly: plot
-    plot(p::Predicate, args...;kwargs...) = pgraph(p, args...; kwargs...)
+    plot(p::Predicate, args...;kwargs...) = ggraph(p, args...; kwargs...)
     export ggraph
 end
 

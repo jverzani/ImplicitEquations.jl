@@ -3,26 +3,8 @@ isthin(x::Interval) = (m = mid(x); m == x.lo || m == x.hi)
 
 
 ## These are missing in Validated NUmerics
-Base.(:(!==)){T<:Real,S<:Real}(i::Interval{T}, j::Interval{S}) = (i.lo !== j.lo) || (i.hi !== j.hi)
-Base.(:(==)){T<:Real,S<:Real}(i::Interval{T}, j::Interval{S}) = (i.lo == j.lo) && (i.hi == j.hi)
-Base.(:(<=)){T<:Real,S<:Real}(i::Interval{T}, j::Interval{S}) = i.hi <= j.lo
-Base.(:(<=)){T<:Integer, S<:Real}(a::Rational{T},i::Interval{S}) = float(a) <= i
-Base.(:(<=)){T<:Real,S<:Integer}(i::Interval{T}, a::Rational{S}) = a > i
-
-            
-      
-Base.(:>=){T<:Real}(a::Real, i::Interval{T}) = a >= i.hi
-
-Base.(:<=){T<:Real}(a::Real, i::Interval{T}) = a <= i.lo
-Base.(:<=){T<:Real}(i::Interval{T}, a::Real) = (a >= i)
-
-Base.(:(==)){T<:Real}(a::MathConst,b::ValidatedNumerics.Interval{T}) = ==(float(a), b)
-Base.(:(==)){T<:Real}(a::ValidatedNumerics.Interval{T}, b::MathConst) = ==(a, float(b))
-Base.(:(==)){T<:Real}(a::Real, i::Interval{T})  = (isthin(i) & (a in i))
-Base.(:(==)){T<:Real}(i::Interval{T}, a::Real)  = (a == i)
-
-Base.(:(!==)){T<:Real}(a::Real, i::Interval{T}) = !(a in i)
-Base.(:(!==)){T<:Real}(i::Interval{T}, a::Real) = (a !== i)
+Base.isless{T<:Real, S<:Real}(i::Interval{T}, j::Interval{S}) = isless(i.hi, j.lo)
+Base.(:<=){T<:Real, S<:Real}(i::Interval{T}, j::Interval{S}) = <=(i.hi, j.lo)
 
 Base.asin(i::Interval) = ValidatedNumerics.Interval(asin(i.lo), asin(i.hi))
 Base.acos(i::Interval) = ValidatedNumerics.Interval(acos(i.lo), acos(i.hi))
@@ -31,22 +13,6 @@ Base.atan(i::Interval) = ValidatedNumerics.Interval(atan(i.lo), atan(i.hi))
 
 Base.max(i::Interval, j::Interval) = Interval(max(i.lo,j.lo), max(i.hi,j.hi))
 Base.min(i::Interval, j::Interval) = Interval(min(i.lo,j.lo), min(i.hi,j.hi))
-
-# function Base.(:^)(x::Interval, q::Rational)
-#     q < 0 && return(1/x^(-q))
-#     ## clean up odd denominator
-#     if isodd(q.den)
-#         val = x^(q.num)
-#         val = Interval(sign(val.lo)*abs(val.lo)^(1/q.den), sign(val.hi) * abs(val.hi)^(1/q.den))
-#     else
-#         ## nothing to salvage by working over Q.
-#         return(x^float(q))
-#     end
-#     val
-# end
-# Base.sqrt(x::Interval) = x^(1//2)
-# Base.cbrt(x::Interval) = x^(1//3)
-
 
 Base.floor(x::Interval) = Interval(floor(x.lo), floor(x.hi))
 Base.ceil(x::Interval) = Interval(ceil(x.lo), ceil(x.hi))
