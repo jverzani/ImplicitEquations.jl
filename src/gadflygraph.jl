@@ -10,7 +10,7 @@ function gxyrange(u, L, R, B, T, W, H)
 end
 
 
-function df_graph(r, L=-5, R=5, B=-5, T=5, W=2^8, H=2^7)
+function df_graph(r, L=-5, R=5, B=-5, T=5, W=2^8, H=2^8; show_red::Bool=false)
 
     cols=[:red=>"red", :black=>"black", :white=>"white"]
     
@@ -18,8 +18,10 @@ function df_graph(r, L=-5, R=5, B=-5, T=5, W=2^8, H=2^7)
 
     d = DataFrames.DataFrame(x_min=float(L), x_max=float(R), y_min=float(B), y_max=float(T), col=cols[:white])
 
-    for u in reds
-        push!(d, tuple(gxyrange(u, L,R,B,T,W,H)..., cols[:red]))
+    if show_red
+        for u in reds
+            push!(d, tuple(gxyrange(u, L,R,B,T,W,H)..., cols[:red]))
+        end
     end
     for u in whites
         push!(d, tuple(gxyrange(u, L,R,B,T,W,H)..., cols[:white]))
@@ -37,9 +39,9 @@ Function to graph within `Gadfly`.
 
 How to add a layer???
 """
-function ggraph(r, L=-5, R=5, B=-5, T=5; W=2^8, H=2^7)
+function ggraph(r, L=-5, R=5, B=-5, T=5; W=2^8, H=2^8, show_red::Bool=false, kwargs...)
     
-    d = df_graph(r, L, R, B, T, W, W)
+    d = df_graph(r, L, R, B, T, W, W, show_red=show_red)
 
     ## use layers so that themed colors can be chosen.
     layers = [layer(sd, x_min=:x_min, x_max=:x_max, y_min=:y_min, y_max=:y_max,

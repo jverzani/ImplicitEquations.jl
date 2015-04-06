@@ -35,7 +35,7 @@ A pixel is important, as the graph will color a pixel
 - red if a solution _might_ exist
 
 """
-function pgraph(r, L=-5, R=5, B=-5, T=5; W=2^9, H=2^8, offset::Int=1)
+function pgraph(r, L=-5, R=5, B=-5, T=5; W=2^9, H=2^8, offset::Int=1, show_red::Bool=false, kwargs...)
     cols=[:red=>"red", :black=>"black", :white=>"white"]
     
     red, black, white = ImplicitEquations.GRAPH(r, L, R, B, T, W, H)
@@ -43,7 +43,9 @@ function pgraph(r, L=-5, R=5, B=-5, T=5; W=2^9, H=2^8, offset::Int=1)
     clf()
     p = gcf()
     axis([L,R,B,T])
-    padd_rect(L, R, B, T, cols[:red])
+    if show_red
+        padd_rect(L, R, B, T, cols[:red])
+    end
     for u in white
        xs, ys = pxyrange(u, L,R,B,T,W,H)
         padd_rect(xs...,ys..., cols[:white])

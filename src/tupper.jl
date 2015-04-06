@@ -47,22 +47,21 @@ function GRAPH(r, L, R, B, T, W, H)
     rects = break_into_squares(W, H)
     
     reds = [Region{Int}(OInterval(u[1], u[2]), OInterval(u[3], u[4])) for u in rects]
+    red = Region{Int}[]         # 1-pixel red, can't decide via check_continuity
     black = Region{Int}[]
     white = Region{Int}[]
     
     k = min(floor(Integer,log2(W)), floor(Integer,log2(H))) # largest square is size 2^k x 2^k
 
-    oreds = copy(reds)
     while (k >= 0) & (length(reds) > 0)
-        oreds = copy(reds)
-        reds = RefinePixels(r, reds, L, R, B, T, W, H, black, white)
+        reds = RefinePixels(r, reds, L, R, B, T, W, H, black, white, red)
         k = k - 1
     end
-    oreds, black, white
+    red, black, white 
 end
 
 ## Refine the region
-function RefinePixels(r, U_k, L, R, B, T, W, H, black, white)
+function RefinePixels(r, U_k, L, R, B, T, W, H, black, white, red)
     ## Uk_1 a refinement of U_k which hold red regions
     Uk_1 = Region{Int}[]
     for u in U_k
@@ -72,13 +71,14 @@ function RefinePixels(r, U_k, L, R, B, T, W, H, black, white)
         elseif out == FALSE
             push!(white, u)
         else
+            ## subdivide and call again if possible,
             x = u.x.val; y = u.y.val
             dx, dy = diam(x), diam(y)
             if (dx > 1) & (dy > 1)
                 hx = div(dx,2); hy = div(dy,2)
                 for i in 0:1, j in 0:1
                     uij = Region{Int}(OInterval(x.lo + i*hx, x.lo + (i+1)*hx), 
-                                 OInterval(y.lo + j*hy, y.lo + (j+1)*hy))
+                                      OInterval(y.lo + j*hy, y.lo + (j+1)*hy))
                     push!(Uk_1, uij)
                 end
             else
@@ -88,6 +88,8 @@ function RefinePixels(r, U_k, L, R, B, T, W, H, black, white)
                     push!(black, u)
                 elseif val == FALSE
                     push!(white, u)
+                else
+                    push!(red, u)
                 end
             end
         end
@@ -96,7 +98,7 @@ function RefinePixels(r, U_k, L, R, B, T, W, H, black, white)
 end
 
 ## for 1-pixel squares, check NaN and continuity
-## Return TRUE, FALSE or MAYBE
+## Return TRUE (Black), FALSE (white) or MAYBE (red)
 function check_continuity(r::Pred, u, L, R, B, T, W, H)
     
     fxy = compute_fxy(r, u,  L, R, B, T, W, H)
@@ -125,10 +127,7 @@ function check_continuity(r::Pred, u, L, R, B, T, W, H)
     end
 
     ## What to do if fxy.cont !== TRUE...
-    ## XXX what to do for a default? XXX
-    ## MAYBE is a better choice --leaving red for pixels we can't determine, but
-    ## FALSE makes better looking graphs.
-    default = FALSE
+    default = MAYBE
     if val == MAYBE
         return(default)
     else

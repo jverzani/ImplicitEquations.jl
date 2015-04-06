@@ -17,7 +17,6 @@ include("intervals.jl")
 include("tupper.jl")
 include("asciigraphs.jl")
 
-
 export eq, neq, ⩵, ≷, ≶
 export screen, I_
 export asciigraph
@@ -30,7 +29,7 @@ export asciigraph
 @require Winston begin
     include(Pkg.dir("ImplicitEquations", "src", "winstongraph.jl"))
     import Winston: plot
-    plot(p::Predicate, args...;kwargs...) = wgraph(p, args...; kwargs...)
+    plot(p::Predicate, args...; show_red::Bool=false, kwargs...) = wgraph(p, args...;  show_red=show_red, kwargs...)
     export wgraph
 end
 
@@ -38,14 +37,14 @@ end
 @require PyPlot begin
     include(Pkg.dir("ImplicitEquations", "src", "pyplotgraph.jl"))
     import PyPlot: plot
-    plot(p::Predicate, args...;kwargs...) = pgraph(p, args...; kwargs...)
+    plot(p::Predicate, args...; show_red::Bool=false, kwargs...) = pgraph(p, args...;  show_red=show_red, kwargs...)
     export pgraph
 end
 
 @require Gadfly begin
     include(Pkg.dir("ImplicitEquations", "src", "gadflygraph.jl"))
     import Gadfly: plot
-    plot(p::Predicate, args...;kwargs...) = ggraph(p, args...; kwargs...)
+    plot(p::Predicate, args...; show_red::Bool=false, kwargs...) = ggraph(p, args...; show_red=show_red, kwargs...)
     export ggraph
 end
 
@@ -53,22 +52,21 @@ end
 @require Patchwork begin
     using Patchwork.SVG
     include(Pkg.dir("ImplicitEquations", "src", "patchworkgraph.jl"))
-
+    ## should have a plot method???
     export pwgraph
 end
 
 ## This has an issue, as we assume Gtk here, but Winston may load with Tk...
-# @require Cairo begin
-#     include(Pkg.dir("ImplicitEquations", "src", "cairograph.jl"))
-#     export cgraph
-# end
-
-
-## must load cairo first
-if :Cairo in names(Main)
+@require Cairo begin
+    if !haskey(ENV, "WINSTON_OUTPUT")
+        ENV["WINSTON_OUTPUT"] = "Gtk"
+    else
+        ENV["WINSTON_OUTPUT"] != "Gtk" && error("Loading cairo will cause an issue with Tk")
+    end
     include(Pkg.dir("ImplicitEquations", "src", "cairograph.jl"))
     export cgraph
 end
+
 
 
 

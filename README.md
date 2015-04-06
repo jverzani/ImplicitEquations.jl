@@ -62,7 +62,7 @@ Inequalities can be graphed as well
 f(x,y)= (y-5)*cos(4*sqrt((x-4)^2 + y^2))
 g(x,y) = x*sin(2*sqrt(x^2 + y^2))
 r = f < g
-plot(r, -10, 10, -10, 10, W=2^9, H=2^9)
+plot(r, -10, 10, -10, 10, W=2^9, H=2^9)  # xmin, xmax, ymin, ymax, pixels_wide, pixels_height
 ```
 
 
@@ -165,7 +165,7 @@ add(p, Curve(xs, map(tl,xs))) # add to a Winston plot
 ```
 
 A more general alternative would be to use another function to represent
-the tangent line and use an or operation to plot both graphs:
+the tangent line and use an "or" operation to plot both graphs:
 
 ```
 g(x,y) = y - tl(x)
@@ -182,25 +182,24 @@ The graphs can be rendered in different ways.
 - for `Winston`, the function  `wgraph` does the work,
 - for `PyPlot`, the function  `pgraph` does the work, and
 - for `Gadfly`, the function  `ggraph` does the work,
-* For rendering with `Cairo` and `Gtk`, a function `cgraph` is exported, but no `plot` method is introduced
 * For rendering with `Patchwork`, the `pwgraph` function is exported, but no `plot` method is introduced
+* For rendering with `Cairo` and `Gtk`, a function `cgraph` is exported, but no `plot` method is introduced (not quite right)
 
-This packages borrows the `Jewel.@require` macro to conditionally load
-modules. Except for `Cairo`, the plotting packages can be loaded
-before or after `ImplicitEquations`. For `Cairo`, the package must be
-loaded prior, as otherwise a conflict between `Tk` and `Gtk` can
+This packages use the `Requires.jl` package to conditionally load
+modules. In theory the plotting packages can be loaded
+before or after `ImplicitEquations`, though in practice that can raise errors.
 arise.
 
 ## Alternatives
 
-Many plots are simply a single level of a contour plot. Contour plots
+Many such plots are simply a single level of a contour plot. Contour plots
 can be drawn with the help of the `Contour.jl` package. They are
-implemented directly in `Gadfly`.
+implemented directly in `Gadfly` and `PyPlot`.
 
 The `SymPy` package exposes SymPy's `plot_implicit` feature that will
 implicitly plot a symbolic expression in 2 variables including
-inequalities. The algorithm there also uses interval arithmetic, as
-possible.
+inequalities. The algorithm there also follows Tupper and uses
+interval arithmetic, as possible.
 
 ## TODO
 

@@ -25,7 +25,7 @@ Base.ceil(x::Interval) = Interval(ceil(x.lo), ceil(x.hi))
 
 
 ## BInterval represents yes (true, true), no (false, false) and maybe (false, true)
-type BInterval 
+type BInterval <: Integer
     lo :: Bool
     hi :: Bool
 
@@ -41,6 +41,8 @@ const TRUE = BInterval(true, true)
 const FALSE = BInterval(false, false)
 const MAYBE = BInterval(false, true)
 
+Base.convert(::Type{BInterval}, y::Bool) = y ? TRUE : FALSE
+Base.promote_rule(::Type{BInterval}, ::Type{Bool}) = BInterval
 
 Base.(:&)(x::BInterval, y::BInterval) = BInterval(x.lo & y.lo, x.hi & y.hi)
 Base.(:|)(x::BInterval, y::BInterval) = BInterval(x.lo | y.lo, x.hi | y.hi)
@@ -59,15 +61,25 @@ function negate_op(op)
 end
 
 ## OIinterval includes more
-type OInterval{T}
+type OInterval{T} <: Real
     val::Interval{T}
     def::BInterval
     cont::BInterval
 end
 
+Base.writemime(io::IO, ::MIME"text/plain", o::OInterval)  = print(io, "OInterval: ", o.val, " def=", o.def, " cont=",o.cont)
+
 OInterval(a,b) = OInterval(Interval(a,b), BInterval(true,true), BInterval(true,true))
 OInterval(a) = OInterval(a,a)   # thin one..
-Base.convert(::Type{OInterval}, i::Interval) = OInterval(float(i.lo), float(i.hi))
+OInterval(i::Interval) = OInterval(a.lo, a.hi)
+
+Base.convert(::Type{OInterval}, i::Interval) = OInterval(i.lo, i.hi)
+Base.convert{T<:Real}(::Type{OInterval{T}}, x::OInterval) = OInterval(convert(T,x.val.lo), convert(T,x.val.hi))
+Base.convert{T<:Real, S<:Real}(::Type{OInterval{T}}, x::S) = OInterval(convert(T,x))
+
+Base.promote_rule{T<:Real, S<:Real}(::Type{OInterval{T}}, ::Type{OInterval{S}}) = OInterval{promote_type(T,S)}
+Base.promote_rule{T<:Real, A<:Real}(::Type{OInterval{T}}, ::Type{A}) = OInterval{T}
+#Base.promote_rule{T<:Real}(::Type{BigFloat}, ::Type{OInterval{T}}) = OInterval{T}
 
 ## A region is two OIntervals.
 type Region{T}
@@ -80,34 +92,24 @@ call(f::Function, u::Region) = f(u.x, u.y)
 ValidatedNumerics.diam(x::OInterval) = diam(x.val)
 
 ## extend functions for OInterval
-
+## Notice these return BIntervals -- not Bools
 ##  bypass isless...
-## Need to override functions for OInterval
-Base.isless(i::OInterval, j::OInterval) = isless(i.val, j.val)
 
-
-
-## Logical values for OIntervals return BIntervals (FALSE, MAYBE, TRUE)
-Base.(:<)(i::OInterval, a::Real) = BInterval(i.val < a, !(i.val >= a))
-Base.(:>=)(a::Real, i::OInterval) = i < a
-
-Base.(:(<=))(i::OInterval, a::Real) = BInterval(i.val <= a, !(i.val > a))
-Base.(:>)(a::Real, i::OInterval) = i <= a
-
-Base.(:(==))(i::OInterval, a::Real) = BInterval(i.val == a, !(i.val !== a))
-Base.(:(==))(a::Real, i::OInterval) = i == a
-
-function Base.(:(!==))(i::OInterval, a::Real)
-    ValidatedNumerics.isempty(i.val) && return FALSE
-    !(a ∈ i.val) ? TRUE : MAYBE
-end
-Base.(:(!==))(a::Real, i::OInterval) = i !== a
-
-Base.(:(>=))(i::OInterval, a::Real) = BInterval(i.val >= a, !(i.val < a))
-Base.(:(<))(a::Real, i::OInterval) = i >= a
-
-Base.(:(>))(i::OInterval, a::Real) = BInterval(i.val > a, !(i.val <= a))
-Base.(:(<=))(a::Real, i::OInterval) = i <= a
+Base.(:<)(i::OInterval, j::OInterval)  = i.val <  j.val ? TRUE : (i.val > j.val ? FALSE : MAYBE)
+Base.(:<=)(i::OInterval, j::OInterval) = i.val <= j.val ? TRUE : (i.val > j.val ? FALSE : MAYBE)
+Base.(:(==))(i::OInterval, j::OInterval) =
+    if i.val == j.val
+        TRUE
+    elseif (i < j) == TRUE
+        FALSE
+    elseif (i > j) == TRUE
+        FALSE
+    else
+        MAYBE
+    end
+Base.(:(!==))(i::OInterval, j::OInterval) = (i < j == TRUE) ? TRUE : ((i > j ==TRUE) ? TRUE : MAYBE)
+Base.(:>=)(i::OInterval, j::OInterval) = j < i
+Base.(:>)(i::OInterval, j::OInterval) = j <= i
 
 
 """
@@ -117,9 +119,9 @@ Use as  with `f(x,y) = x*y * screen(x > 0)`
 
 Also aliased to I_(x>0)
 
-As an expression like `x::OInterval > 0` is not Boolean, but
+An expression like `x::OInterval > 0` is not Boolean, but
 rather a `BInterval` which allows for a "maybe" state. As such, a
-simple ternary operator use like `x > 0 ? 1 : NaN` won't work.
+simple ternary operator, like `x > 0 ? 1 : NaN` won't work, to screen values.
 
 """
 screen(ex) = (ex == FALSE) ? NaN : 1 
@@ -127,8 +129,6 @@ const I_ = screen               # indicator function like!
 
 ## Functions which are continuous everywhere
 ## +, -, *, sin, cos, ...
-Base.(:+)(x::Real, y::OInterval) = OInterval(x + y.val, y.def, y.cont)
-Base.(:+)(y::OInterval, x::Real) = OInterval(x + y.val, y.def, y.cont)
 function Base.(:+)(x::OInterval, y::OInterval)
     val = x.val + y.val
     def = x.def & y.def
@@ -136,8 +136,6 @@ function Base.(:+)(x::OInterval, y::OInterval)
     OInterval(val, def, cont)
 end
 
-Base.(:-)(x::Real, y::OInterval) = OInterval(x - y.val, y.def, y.cont)
-Base.(:-)(y::OInterval, x::Real) = OInterval(-x + y.val, y.def, y.cont)
 function Base.(:-)(x::OInterval, y::OInterval)
     val = x.val - y.val
     def = x.def & y.def
@@ -146,8 +144,6 @@ function Base.(:-)(x::OInterval, y::OInterval)
 end
 Base.(:-)(x::OInterval) = OInterval(-x.val, x.def, x.cont)
 
-Base.(:*)(x::Real, y::OInterval) = OInterval(x * y.val, y.def, y.cont)
-Base.(:*)(y::OInterval, x::Real) = OInterval(x * y.val, y.def, y.cont)
 function Base.(:*)(x::OInterval, y::OInterval)
     val = x.val * y.val
     def = x.def & y.def
@@ -219,8 +215,6 @@ Base.exp(x::OInterval) = OInterval(exp(x.val), x.def, x.cont)
 
 ## /
 ## division is slow, as ValidatedNumerics makes it so...
-Base.(:/)(x::Real, y::OInterval) = OInterval(x,x)/y
-Base.(:/)(x::OInterval, y::Real) = OInterval(x.val/y, x.def, x.cont)
 function Base.(:/)(x::OInterval, y::OInterval)
     ## 0 is the issue. 
     if 0.0 ∈ y.val
@@ -244,9 +238,6 @@ end
 Base.log(k::MathConst{:e},x::OInterval) = log(x)
 Base.log(k::Real, x::OInterval) = log(x)/log(k)
 
-## Powers ^, sqrt, cbrt
-Base.(:^)(a::Real, x::OInterval) = exp(x * log(a))
-
 function Base.(:^)(a::OInterval, x::OInterval)
     OInterval(a.val^x.val, x.def, x.cont)
 end
@@ -257,7 +248,7 @@ function Base.(:^)(x::OInterval, n::Integer)
 end
 
 ## Rational ones can be exact, whereas floating point exponents are not. The main
-## example would be `x^(1/3)` and `x^(1/
+## example would be `x^(1/3)` and `x^(1//3)`
 function Base.(:^)(x::OInterval, q::Rational)
     q < 0 && return(1/x^(-q))
     ## clean up odd denominator
@@ -312,13 +303,15 @@ end
 
 ## pixels are [0, W) x [0, H) where (0,0) lower left, (W-1, H-1) upper right
 ## we assume reg is of the form [a,b) x [c,d)
+## TODO: Should this depend on the operation? f(I) < a should use wider I, f(I) > a should use narrower?
 function xy_region(u, L, R, B, T, W, H)
     px, py = u.x.val,  u.y.val
     a = L + px.lo * (R - L) / W
     b = L + (px.hi) * (R - L) / W
     c = B + py.lo * (T - B) / H
     d = B + (py.hi) * (T - B) / H
-    x, y  = OInterval(a,b-sqrt(eps())), OInterval(c,d-sqrt(eps()))
+    delta = sqrt(eps())
+    x, y  = OInterval(a+delta,b-delta), OInterval(c+delta,d-delta)
     x, y
 end
 
@@ -333,10 +326,9 @@ Compute whether predicate holds in a given region. Returns FALSE, TRUE or MAYBE
 
 """
 function compute(p::Pred, u::Region, L, R, B, T, W, H)
-    
     fxy = compute_fxy(p, u, L, R, B, T, W, H)
 
-    fxy.def == FALSE && return (FALSE)
+    (fxy.def == FALSE) && return (FALSE)
     ValidatedNumerics.isempty(fxy.val) && return (FALSE & fxy.def)
 
     if p.op === ==
@@ -349,9 +341,7 @@ function compute(p::Pred, u::Region, L, R, B, T, W, H)
 
     ## domain tracking
     out & fxy.def
-end
-
-    
+end    
 ## build up answer
 function compute(ps::Preds, u::Region, L, R, B, T, W, H)
     vals = [compute(p, u, L, R, B, T, W, H) for p in ps.ps]
@@ -366,7 +356,7 @@ end
 
 Does this function have a zero crossing? Heuristic check.
 
-We return `TRUE` or `FALSE` here though `MAYBE` is more apt for the `FALSE` case. However, that 
+We return `TRUE` or `MAYBE`. However, that 
 leaves some functions showing too much red in the case where there is no zero.
 
 """

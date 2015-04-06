@@ -35,12 +35,14 @@ A pixel is important, as the graph will color a pixel
 - red if a solution _might_ exist
 
 """
-function wgraph(r, L=-5, R=5, B=-5, T=5; W=2^9, H=2^8, offset::Int=1)
+function wgraph(r, L=-5, R=5, B=-5, T=5; W=2^9, H=2^8, offset::Int=1, show_red::Bool=false, kwargs...)
     cols=[:red=>"red", :black=>"black", :white=>"white"]
     
     red, black, white = GRAPH(r, L, R, B, T, W, H)
     p = FramedPlot()
-    add_rect(p, L + offset, R, B + offset, T, cols[:red])
+    if show_red
+        add_rect(p, L + offset, R, B + offset, T, cols[:red])
+    end
     for u in white
         add_rect(p, wxyrange(u, L,R,B,T,W,H, offset=offset)..., cols[:white])
     end
