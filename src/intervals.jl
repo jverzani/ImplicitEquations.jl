@@ -25,7 +25,7 @@ Base.ceil(x::Interval) = Interval(ceil(x.lo), ceil(x.hi))
 
 
 ## BInterval represents yes (true, true), no (false, false) and maybe (false, true)
-type BInterval <: Integer
+immutable BInterval <: Integer
     lo :: Bool
     hi :: Bool
 
@@ -61,7 +61,7 @@ function negate_op(op)
 end
 
 ## OIinterval includes more
-type OInterval{T} <: Real
+immutable OInterval{T} <: Real
     val::Interval{T}
     def::BInterval
     cont::BInterval
@@ -82,7 +82,7 @@ Base.promote_rule{T<:Real, A<:Real}(::Type{OInterval{T}}, ::Type{A}) = OInterval
 #Base.promote_rule{T<:Real}(::Type{BigFloat}, ::Type{OInterval{T}}) = OInterval{T}
 
 ## A region is two OIntervals.
-type Region{T}
+immutable Region{T}
     x::OInterval{T}                           # Real
     y::OInterval{T}                           # Real
 end
@@ -311,7 +311,8 @@ function xy_region(u, L, R, B, T, W, H)
     c = B + py.lo * (T - B) / H
     d = B + (py.hi) * (T - B) / H
     delta = sqrt(eps())
-    x, y  = OInterval(a+delta,b-delta), OInterval(c+delta,d-delta)
+    
+    x, y  = OInterval(a+(u.x.cont==TRUE)*delta,b-delta), OInterval(c+0*delta,d-delta)
     x, y
 end
 
