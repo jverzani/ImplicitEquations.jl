@@ -14,6 +14,7 @@ over the default region as follows:
 
 ```
 using PyPlot
+pygui(false)
 figure(figsize=(5.12, 3.84))
 using ImplicitEquations
 
@@ -75,21 +76,7 @@ A "pixel" represents a region comprised of two intervals. The excellent `Validat
 (In the above pixel does not refer to screen pixels for all the graphical outputs, only for a few.)
 
 
-This code snippet will illustrate the algorithm employed here within an `IJulia` notebook (provided the packages are installed).
-
-```
-Verbatim("""
-using Interact, Patchwork, Patchwork.SVG
-
-f(x,y) = y - sin(x)
-
-@manipulate for k in 2:7
-  ImplicitEquations.pwgraph(f==0, W=2^k, H=2^k, λ=2^(9-k), offset=-1, show_red=true)
-end
-""")
-```
-
-This static figure also shows the algorithm:
+This static figure shows the algorithm:
 
 ![Algorithm](http://i.imgur.com/8Mtmb7v.png)
 
@@ -175,16 +162,13 @@ The graphs can be rendered in different ways.
 
 - for `PyPlot`, the function  `pgraph` does the work, and
 
-- for `Gadfly`, the function  `ggraph` does the work,
-
-* For rendering with `Patchwork`, the `pwgraph` function is exported, but no `plot` method is introduced
+- for `Gadfly`, the function  `ggraph` does the work. (`Gadfly` must be loaded prior to `ImplicitEquations`.)
 
 * For rendering with `Cairo` and `Gtk`, a function `cgraph` is exported, but no `plot` method is introduced (not quite right)
 
 This packages use the `Requires.jl` package to conditionally load
 modules. In theory the plotting packages can be loaded
-before or after `ImplicitEquations`, though in practice that can raise errors.
-arise.
+before or after `ImplicitEquations`, though in practice that can raise errors, such as with `Gadfly`.
 
 ## Alternatives
 

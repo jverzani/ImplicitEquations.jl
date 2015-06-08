@@ -2,7 +2,7 @@ module ImplicitEquations
 
 
 using ValidatedNumerics
-
+using Compat
 using Requires ## for @require macro
 
 using Docile
@@ -48,13 +48,12 @@ end
     export ggraph
 end
 
-
-@require Patchwork begin
-    using Patchwork.SVG
-    include(Pkg.dir("ImplicitEquations", "src", "patchworkgraph.jl"))
-    ## should have a plot method???
-    export pwgraph
-end
+## Patchwork no longer has SVG interface, we deprecate for now.
+# @require Patchwork begin
+#     include(Pkg.dir("ImplicitEquations", "src", "patchworkgraph.jl"))
+#     ## should have a plot method???
+#     export pwgraph
+# end
 
 ## This has an issue, as we assume Gtk here, but Winston may load with Tk...
 @require Cairo begin

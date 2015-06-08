@@ -8,7 +8,7 @@ two-variable, real-valued function `f`, such as `f == 0`.
 Example:
 
 ```
-using Patchwork, Patchwork.SVG
+using Patchwork
 using ImplicitEquations
 f(x,y) = x^2 + 2y^2
 pwgraph((f >= 2) & (f <= 7))

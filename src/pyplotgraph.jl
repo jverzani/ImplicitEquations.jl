@@ -19,7 +19,7 @@ end
 
 """ 
 
-Function to graph, using `Winston`, a predicate related to a
+Function to graph, using `PyPlot`, a predicate related to a
 two-dimensional equation, such as `f == 0` or `f < g`, where `f` and
 `g` are functions, e.g., `f(x,y) = y - sqrt(x)`. The positional
 arguments are `L`, `R`, `B`, `T` which indicate the x-y range of the 

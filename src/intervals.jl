@@ -51,13 +51,13 @@ Base.(:(==))(x::BInterval, y::BInterval) = (x.lo==y.lo)&&(x.hi==y.hi)
 
 ## ...
 function negate_op(op)
-    op === <   && return(>=)
-    op === <=  && return(>)
-    op === ==  && return(!==)
-    op === !== && return(==)
-    op === >=  && return(<)
-    op === >   && return(<=)
-    op === in  && return((x,y) -> !in(x,y))
+    (op === <)   && return(>=)
+    (op === <=)  && return(>)
+    (op === ==)  && return(!==)
+    (op === !==) && return(==)
+    (op === >=)  && return(<)
+    (op === >)   && return(<=)
+    (op === in)  && return((x,y) -> !in(x,y))
 end
 
 ## OIinterval includes more
@@ -366,8 +366,8 @@ function cross_zero(r::Pred, u::Region, L, R, B, T, W, H)
     dx, dy = diam(x), diam(y)
     
     n = 20                      # number of random points chosen
-    λ1s, λ2s = [0.0, 1.0 ,rand(n)], [0.0, 1.0, rand(n)]
-    β1s, β2s = [1.0, 0.0, rand(n)], [1.0, 0.0, rand(n)]
+    λ1s, λ2s = [0.0; 1.0;rand(n)], [0.0; 1.0; rand(n)]
+    β1s, β2s = [1.0; 0.0; rand(n)], [1.0; 0.0; rand(n)]
     for i in 1:(n+2)
         rx, ry = x.val.lo + λ1s[i]*dx, y.val.lo + λ2s[i] * dy
         sx, sy = x.val.lo + β1s[i]*dx, y.val.lo + β2s[i] * dy
@@ -390,7 +390,7 @@ function check_inequality(r::Pred, u::Region, L, R, B, T, W, H)
     dx, dy = diam(x), diam(y)
     # check 10 random points, here fxy.def == TRUE so we can evaluate function
     n = 10
-    λ1s, λ2s = [0.0, 1.0 ,rand(n)], [0.0, 1.0, rand(n)]
+    λ1s, λ2s = [0.0; 1.0; rand(n)], [0.0; 1.0; rand(n)]
     for i in 1:n
         rx, ry = x.val.lo + λ1s[i]*dx, y.val.lo + λ2s[i] * dy
         if r.op(r.f(rx,ry), r.val)

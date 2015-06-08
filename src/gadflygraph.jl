@@ -37,7 +37,6 @@ end
 
 Function to graph within `Gadfly`.
 
-How to add a layer???
 """
 function ggraph(r, L=-5, R=5, B=-5, T=5; W=2^8, H=2^8, show_red::Bool=false, kwargs...)
     
