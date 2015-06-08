@@ -30,7 +30,7 @@ export asciigraph
     include(Pkg.dir("ImplicitEquations", "src", "winstongraph.jl"))
     import Winston: plot
     plot(p::Predicate, args...; show_red::Bool=false, kwargs...) = wgraph(p, args...;  show_red=show_red, kwargs...)
-    export wgraph
+#    export wgraph
 end
 
 
@@ -38,14 +38,14 @@ end
     include(Pkg.dir("ImplicitEquations", "src", "pyplotgraph.jl"))
     import PyPlot: plot
     plot(p::Predicate, args...; show_red::Bool=false, kwargs...) = pgraph(p, args...;  show_red=show_red, kwargs...)
-    export pgraph
+#    export pgraph
 end
 
 @require Gadfly begin
     include(Pkg.dir("ImplicitEquations", "src", "gadflygraph.jl"))
     import Gadfly: plot
     plot(p::Predicate, args...; show_red::Bool=false, kwargs...) = ggraph(p, args...; show_red=show_red, kwargs...)
-    export ggraph
+#    export ggraph
 end
 
 ## Patchwork no longer has SVG interface, we deprecate for now.
@@ -56,15 +56,15 @@ end
 # end
 
 ## This has an issue, as we assume Gtk here, but Winston may load with Tk...
-@require Cairo begin
-    if !haskey(ENV, "WINSTON_OUTPUT")
-        ENV["WINSTON_OUTPUT"] = "Gtk"
-    else
-        ENV["WINSTON_OUTPUT"] != "Gtk" && error("Loading cairo will cause an issue with Tk")
-    end
-    include(Pkg.dir("ImplicitEquations", "src", "cairograph.jl"))
-    export cgraph
-end
+#@require Cairo begin
+#    if !haskey(ENV, "WINSTON_OUTPUT")
+#        ENV["WINSTON_OUTPUT"] = :gtk
+#    else
+#        ENV["WINSTON_OUTPUT"] != "gtk" && error("Loading cairo will cause an issue with Tk")
+#    end
+#    include(Pkg.dir("ImplicitEquations", "src", "cairograph.jl"))
+#    export cgraph
+#end
 
 
 

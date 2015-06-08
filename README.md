@@ -13,7 +13,7 @@ the `julia` user to naturally represent and easily render graphs of
 implicit functions and equations.
 
 
-We give one example, others may be viewded as an `IJulia` notebook ([here](http://nbviewer.ipython.org/github/jverzani/ImplicitEquations.jl/blob/master/examples/examples.ipynb)).
+We give one example, others may be viewed as an `IJulia` notebook ([here](http://nbviewer.ipython.org/github/jverzani/ImplicitEquations.jl/blob/master/examples/examples.ipynb)).
 
 The
 [Devils curve](http://www-groups.dcs.st-and.ac.uk/~history/Curves/Devils.html)
