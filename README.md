@@ -2,14 +2,11 @@
 
 [![Build Status](https://travis-ci.org/jverzani/ImplicitEquations.jl.svg?branch=master)](https://travis-ci.org/jverzani/ImplicitEquations.jl)
 
-
-
-This paper by
-[Tupper](http://www.dgp.toronto.edu/people/mooncake/papers/SIGGRAPH2001_Tupper.pdf)
-details a method for graphing two-dimensional implicit equations and
+In a paper, [Tupper](http://www.dgp.toronto.edu/people/mooncake/papers/SIGGRAPH2001_Tupper.pdf)
+presents a method for graphing two-dimensional implicit equations and
 inequalities. This package gives an
-implementation of the  paper's basic algorithms to allow
-the `julia` user to naturally represent and easily render graphs of
+implementation of the paper's basic algorithms to allow
+the `Julia` user to naturally represent and easily render graphs of
 implicit functions and equations.
 
 

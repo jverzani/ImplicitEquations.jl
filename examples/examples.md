@@ -61,7 +61,7 @@ plot(r, -10, 10, -10, 10, W=2^9, H=2^9, show_red=true)  # xmin, xmax, ymin, ymax
 
 
 
-The coloring scheme employed (mostly) follows Tupper and is based on pixels:
+The coloring scheme employed (mostly) follows Tupper and is based on "pixels":
 
 - if a pixel is white, there are no solutions of the predicate `r` within the
 pixel;
@@ -71,9 +71,11 @@ within the pixel;
 
 - if a pixel is red, there may or may not be solutions of the predicate `r` within the pixel. (However, we check these pixels probabilistically and color them black or white.) Red pixels show when the keyword argument `show_red` is assigned to be `true`, as above.
 
-A "pixel" represents a region comprised of two intervals. The excellent `ValidatedNumerics` package is used for the underlying interval arithmetic.
+In the above, a pixel does not refer to screen pixels, rather a
+"pixel" represents a rectangular region comprised of two intervals. The excellent
+`ValidatedNumerics` package is used for the underlying interval
+arithmetic.
 
-(In the above pixel does not refer to screen pixels for all the graphical outputs, only for a few.)
 
 
 This static figure shows the algorithm for $f(x,y) = y - \sqrt{x}$:
