@@ -2,7 +2,8 @@
 isthin(x::Interval) = (m = mid(x); m == x.lo || m == x.hi)
 
 
-## These are missing in Validated NUmerics
+## These are missing in the latest released  Validated NUmerics, but will be replaced with next
+## release
 Base.isless{T<:Real, S<:Real}(i::Interval{T}, j::Interval{S}) = isless(i.hi, j.lo)
 Base.(:<=){T<:Real, S<:Real}(i::Interval{T}, j::Interval{S}) = <=(i.hi, j.lo)
 
@@ -24,7 +25,7 @@ Base.ceil(x::Interval) = Interval(ceil(x.lo), ceil(x.hi))
 
 
 
-## BInterval represents yes (true, true), no (false, false) and maybe (false, true)
+## BInterval represents TRUE (true, true), FALSE (false, false) and MAYBE (false, true)
 immutable BInterval <: Integer
     lo :: Bool
     hi :: Bool
@@ -120,7 +121,7 @@ Use as  with `f(x,y) = x*y * screen(x > 0)`
 Also aliased to I_(x>0)
 
 An expression like `x::OInterval > 0` is not Boolean, but
-rather a `BInterval` which allows for a "maybe" state. As such, a
+rather a `BInterval` which allows for a "MAYBE" state. As such, a
 simple ternary operator, like `x > 0 ? 1 : NaN` won't work, to screen values.
 
 """
@@ -214,7 +215,7 @@ Base.exp(x::OInterval) = OInterval(exp(x.val), x.def, x.cont)
 ## discontinous functions
 
 ## /
-## division is slow, as ValidatedNumerics makes it so...
+## division is slow
 function Base.(:/)(x::OInterval, y::OInterval)
     ## 0 is the issue. 
     if 0.0 ∈ y.val
@@ -342,7 +343,8 @@ function compute(p::Pred, u::Region, L, R, B, T, W, H)
 
     ## domain tracking
     out & fxy.def
-end    
+end
+
 ## build up answer
 function compute(ps::Preds, u::Region, L, R, B, T, W, H)
     vals = [compute(p, u, L, R, B, T, W, H) for p in ps.ps]

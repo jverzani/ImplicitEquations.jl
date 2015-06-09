@@ -9,9 +9,9 @@ abstract Predicate
 
 A predicate is defined in terms of a function of two variables, an
 inquality, and either another function or a real number.  For example,
-`f < 0` or `f >= g`. The one case `f==g` is not defined, as it crosses
+`f < 0` or `f >= g`. The case `f==g` and `f != g` are not defined, as doing so crosses
 up `Gadfly` and other code that compares functions for equality. Use
-`eq(f,g)` instead or `f \Equal<tab> g`.
+`eq(f,g)`  or `f \Equal<tab> g` for equality and `neq(f,g)` or `f \gtrless<tab> g` for not equal.
 
 Available operations to produce predicates:
 
