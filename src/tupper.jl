@@ -46,15 +46,14 @@ end
 function GRAPH(r, L, R, B, T, W, H)
     rects = break_into_squares(W, H)
     
-    
     k = min(floor(Integer,log2(W)), floor(Integer,log2(H))) # largest square is size 2^k x 2^k
 
-    reds = [Region{Int}(OInterval(u[1], u[2]), OInterval(u[3], u[4])) for u in rects]
+    reds = [Region(OInterval(u[1], u[2]), OInterval(u[3], u[4])) for u in rects]
     @compat sizehint!(reds, W)
     
-    red = Region{Int}[]         # 1-pixel red, can't decide via check_continuity
-    black = Region{Int}[]
-    white = Region{Int}[]
+    red = Region[]         # 1-pixel red, can't decide via check_continuity
+    black = Region[]
+    white = Region[]
 
     while (k >= 0) & (length(reds) > 0)
         reds = RefinePixels(r, reds, L, R, B, T, W, H, black, white, red)
@@ -66,7 +65,7 @@ end
 ## Refine the region
 function RefinePixels(r, U_k, L, R, B, T, W, H, black, white, red)
     ## Uk_1 a refinement of U_k which hold red regions
-    Uk_1 = Region{Int}[]
+    Uk_1 = Region[]
     for u in U_k
         out = compute(r, u,  L, R, B, T, W, H)
         if out == TRUE
@@ -80,7 +79,7 @@ function RefinePixels(r, U_k, L, R, B, T, W, H, black, white, red)
             if (dx > 1) & (dy > 1)
                 hx = div(dx,2); hy = div(dy,2)
                 for i in 0:1, j in 0:1
-                    uij = Region{Int}(OInterval(x.lo + i*hx, x.lo + (i+1)*hx), 
+                    uij = Region(OInterval(x.lo + i*hx, x.lo + (i+1)*hx), 
                                       OInterval(y.lo + j*hy, y.lo + (j+1)*hy))
                     push!(Uk_1, uij)
                 end

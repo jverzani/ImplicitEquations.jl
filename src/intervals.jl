@@ -62,30 +62,41 @@ function negate_op(op)
 end
 
 ## OIinterval includes more
-immutable OInterval{T} <: Real
-    val::Interval{T}
+immutable OInterval <: Real
+    val::Interval
     def::BInterval
     cont::BInterval
+    OInterval(val, def, cont) = new(val, def, cont)
 end
 
 Base.writemime(io::IO, ::MIME"text/plain", o::OInterval)  = print(io, "OInterval: ", o.val, " def=", o.def, " cont=",o.cont)
 
-OInterval(a,b) = OInterval(ValidatedNumerics.@interval(a,b), BInterval(true,true), BInterval(true,true))
+##OInterval(a,b) = OInterval(ValidatedNumerics.@interval(a,b), BInterval(true,true), BInterval(true,true))
+function OInterval{T <: Real, S <: Real}(a::T, b::S)
+    i = ValidatedNumerics.Interval(a,b)
+    OInterval(i, TRUE, TRUE)
+end
+## why is this one necessary?
+function OInterval(a::OInterval, b::OInterval)
+    a === a ? a : error("a is not b?")
+end
+#OInterval(a,b) = OInterval(ValidatedNumerics.@interval(a,b), BInterval(true,true), BInterval(true,true))
 OInterval(a) = OInterval(a,a)   # thin one..
 OInterval(i::Interval) = OInterval(i.lo, i.hi)
 
 Base.convert(::Type{OInterval}, i::Interval) = OInterval(i.lo, i.hi)
-Base.convert{T<:Real}(::Type{OInterval{T}}, x::OInterval) = OInterval(convert(T,x.val.lo), convert(T,x.val.hi))
-Base.convert{T<:Real, S<:Real}(::Type{OInterval{T}}, x::S) = OInterval(convert(T,x))
+#Base.convert{T<:Real}(::Type{OInterval}, x::OInterval) = OInterval(convert(T,x.val.lo), convert(T,x.val.hi))
+Base.convert{S<:Real}(::Type{OInterval}, x::S) = OInterval(x)
 
-Base.promote_rule{T<:Real, S<:Real}(::Type{OInterval{T}}, ::Type{OInterval{S}}) = OInterval{promote_type(T,S)}
-Base.promote_rule{T<:Real, A<:Real}(::Type{OInterval{T}}, ::Type{A}) = OInterval{T}
+#Base.promote_rule{T<:Real, S<:Real}(::Type{OInterval{T}}, ::Type{OInterval{S}}) = OInterval{promote_type(T,S)}
+#Base.promote_rule{T<:Real, A<:Real}(::Type{OInterval{T}}, ::Type{A}) = OInterval{T}
+Base.promote_rule{A<:Real}(::Type{OInterval}, ::Type{A}) = OInterval
 #Base.promote_rule{T<:Real}(::Type{BigFloat}, ::Type{OInterval{T}}) = OInterval{T}
 
 ## A region is two OIntervals.
-immutable Region{T}
-    x::OInterval{T}                           # Real
-    y::OInterval{T}                           # Real
+immutable Region
+    x::OInterval
+    y::OInterval
 end
 call(f::Function, u::Region) = f(u.x, u.y)
 
