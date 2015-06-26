@@ -15,8 +15,8 @@ Base.atan(i::Interval) = ValidatedNumerics.Interval(atan(i.lo), atan(i.hi))
 Base.max(i::Interval, j::Interval) = Interval(max(i.lo,j.lo), max(i.hi,j.hi))
 Base.min(i::Interval, j::Interval) = Interval(min(i.lo,j.lo), min(i.hi,j.hi))
 
-Base.floor(x::Interval) = Interval(floor(x.lo), floor(x.hi))
-Base.ceil(x::Interval) = Interval(ceil(x.lo), ceil(x.hi))
+#Base.floor(x::Interval) = Interval(floor(x.lo), floor(x.hi))
+#Base.ceil(x::Interval) = Interval(ceil(x.lo), ceil(x.hi))
 
 ## others...
 
@@ -70,9 +70,9 @@ end
 
 Base.writemime(io::IO, ::MIME"text/plain", o::OInterval)  = print(io, "OInterval: ", o.val, " def=", o.def, " cont=",o.cont)
 
-OInterval(a,b) = OInterval(Interval(a,b), BInterval(true,true), BInterval(true,true))
+OInterval(a,b) = OInterval(ValidatedNumerics.@interval(a,b), BInterval(true,true), BInterval(true,true))
 OInterval(a) = OInterval(a,a)   # thin one..
-OInterval(i::Interval) = OInterval(a.lo, a.hi)
+OInterval(i::Interval) = OInterval(i.lo, i.hi)
 
 Base.convert(::Type{OInterval}, i::Interval) = OInterval(i.lo, i.hi)
 Base.convert{T<:Real}(::Type{OInterval{T}}, x::OInterval) = OInterval(convert(T,x.val.lo), convert(T,x.val.hi))
