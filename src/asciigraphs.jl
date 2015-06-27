@@ -25,7 +25,7 @@ A pixel is important, as the graph will color a pixel
 
 - "white" (e.g., " ") if no solution exists in the region indicated by the pixel
 - "black" (e.g., "x") if a solution is known to exist in the region
-- red (e.g. ".") if a solution _might_ exist
+- "red" (e.g. ".") if a solution _might_ exist
 
 """
 function asciigraph(r, L=-5, R=5, B=-5, T=5; W=2^4, H=2^4)

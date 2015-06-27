@@ -42,7 +42,17 @@ function break_into_squares(W, H)
     rects
 end
 
-## Main algorithm of Tupper
+
+"""
+Main algorithm of Tupper.
+
+Break region into square regions
+for each square region, subdivide into 4 regions. For each check if there is no solution, if so add to white. Otherwise, refine the region by repeating until we can't subdivide
+
+At that point, check each pixel-by-pixel region for possible values.
+
+Return red, black and white vectors of Regions.
+"""
 function GRAPH(r, L, R, B, T, W, H)
     rects = break_into_squares(W, H)
     

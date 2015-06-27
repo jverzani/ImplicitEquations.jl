@@ -1,27 +1,10 @@
-## Additions to ValidatedNumerics
-isthin(x::Interval) = (m = mid(x); m == x.lo || m == x.hi)
-
-
-## These are missing in the latest released  Validated NUmerics, but will be replaced with next
-## release
+## a few definitionsn for ValidatedNumerics that don't fit in there:
+## Validated numerics doesn't define these, as the order ins't a total order 
 Base.isless{T<:Real, S<:Real}(i::Interval{T}, j::Interval{S}) = isless(i.hi, j.lo)
 Base.(:<=){T<:Real, S<:Real}(i::Interval{T}, j::Interval{S}) = <=(i.hi, j.lo)
 
-Base.asin(i::Interval) = ValidatedNumerics.Interval(asin(i.lo), asin(i.hi))
-Base.acos(i::Interval) = ValidatedNumerics.Interval(acos(i.lo), acos(i.hi))
-Base.atan(i::Interval) = ValidatedNumerics.Interval(atan(i.lo), atan(i.hi))
-
-
 Base.max(i::Interval, j::Interval) = Interval(max(i.lo,j.lo), max(i.hi,j.hi))
 Base.min(i::Interval, j::Interval) = Interval(min(i.lo,j.lo), min(i.hi,j.hi))
-
-#Base.floor(x::Interval) = Interval(floor(x.lo), floor(x.hi))
-#Base.ceil(x::Interval) = Interval(ceil(x.lo), ceil(x.hi))
-
-## others...
-
-
-
 
 
 
@@ -61,7 +44,7 @@ function negate_op(op)
     (op === in)  && return((x,y) -> !in(x,y))
 end
 
-## OIinterval includes more
+## OIinterval includes interval, if defined on interval and if continuous on interval
 immutable OInterval <: Real
     val::Interval
     def::BInterval
@@ -71,27 +54,15 @@ end
 
 Base.writemime(io::IO, ::MIME"text/plain", o::OInterval)  = print(io, "OInterval: ", o.val, " def=", o.def, " cont=",o.cont)
 
-##OInterval(a,b) = OInterval(ValidatedNumerics.@interval(a,b), BInterval(true,true), BInterval(true,true))
-function OInterval{T <: Real, S <: Real}(a::T, b::S)
-    i = ValidatedNumerics.Interval(a,b)
-    OInterval(i, TRUE, TRUE)
-end
-## why is this one necessary?
-function OInterval(a::OInterval, b::OInterval)
-    a === a ? a : error("a is not b?")
-end
-#OInterval(a,b) = OInterval(ValidatedNumerics.@interval(a,b), BInterval(true,true), BInterval(true,true))
-OInterval(a) = OInterval(a,a)   # thin one..
+## some outer constructors...
+OInterval{T <: Real, S <: Real}(a::T, b::S) = OInterval(ValidatedNumerics.Interval(a,b), TRUE, TRUE)
+OInterval(a::OInterval, b::OInterval) = a === a ? a : error("a is not b?") ## why is this one necessary?
+OInterval(a) = OInterval(a,a)   # thin one...
 OInterval(i::Interval) = OInterval(i.lo, i.hi)
 
 Base.convert(::Type{OInterval}, i::Interval) = OInterval(i.lo, i.hi)
-#Base.convert{T<:Real}(::Type{OInterval}, x::OInterval) = OInterval(convert(T,x.val.lo), convert(T,x.val.hi))
 Base.convert{S<:Real}(::Type{OInterval}, x::S) = OInterval(x)
-
-#Base.promote_rule{T<:Real, S<:Real}(::Type{OInterval{T}}, ::Type{OInterval{S}}) = OInterval{promote_type(T,S)}
-#Base.promote_rule{T<:Real, A<:Real}(::Type{OInterval{T}}, ::Type{A}) = OInterval{T}
 Base.promote_rule{A<:Real}(::Type{OInterval}, ::Type{A}) = OInterval
-#Base.promote_rule{T<:Real}(::Type{BigFloat}, ::Type{OInterval{T}}) = OInterval{T}
 
 ## A region is two OIntervals.
 immutable Region

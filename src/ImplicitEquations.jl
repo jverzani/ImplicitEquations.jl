@@ -5,8 +5,9 @@ using ValidatedNumerics
 using Compat
 using Requires ## for @require macro
 
-using Docile
-@document
+if VERSION < v"0.4-"
+    using Docile
+end
 
 import ValidatedNumerics: Interval, diam
 
@@ -30,7 +31,6 @@ export asciigraph
     include(Pkg.dir("ImplicitEquations", "src", "winstongraph.jl"))
     import Winston: plot
     plot(p::Predicate, args...; show_red::Bool=false, kwargs...) = wgraph(p, args...;  show_red=show_red, kwargs...)
-#    export wgraph
 end
 
 
@@ -38,14 +38,12 @@ end
     include(Pkg.dir("ImplicitEquations", "src", "pyplotgraph.jl"))
     import PyPlot: plot
     plot(p::Predicate, args...; show_red::Bool=false, kwargs...) = pgraph(p, args...;  show_red=show_red, kwargs...)
-#    export pgraph
 end
 
 @require Gadfly begin
     include(Pkg.dir("ImplicitEquations", "src", "gadflygraph.jl"))
     import Gadfly: plot
     plot(p::Predicate, args...; show_red::Bool=false, kwargs...) = ggraph(p, args...; show_red=show_red, kwargs...)
-#    export ggraph
 end
 
 ## Patchwork no longer has SVG interface, we deprecate for now.
