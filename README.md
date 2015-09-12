@@ -1,9 +1,9 @@
-[![ImplicitEquations](http://pkg.julialang.org/badges/ImplicitEquations_release.svg)](http://pkg.julialang.org/?pkg=ImplicitEquations&ver=release)
-[![ImplicitEquations](http://pkg.julialang.org/badges/ImplicitEquations_nightly.svg)](http://pkg.julialang.org/?pkg=ImplicitEquations&ver=nightly)
+[![ImplicitEquations](http://pkg.julialang.org/badges/ImplicitEquations_0.3.svg)](http://pkg.julialang.org/?pkg=ImplicitEquations&ver=0.3)
+[![ImplicitEquations](http://pkg.julialang.org/badges/ImplicitEquations_0.4.svg)](http://pkg.julialang.org/?pkg=ImplicitEquations&ver=0.4)
 &nbsp;
 Linux: [![Build Status](https://travis-ci.org/jverzani/ImplicitEquations.jl.svg?branch=master)](https://travis-ci.org/jverzani/ImplicitEquations.jl)
 &nbsp;
-Windows: [![Build Status](https://ci.appveyor.com/api/projects/status/github/jverzani/ImplicitEquations.jl?branch=master&svg=true)](https://ci.appveyor.com/project/tkelman/example-jl/branch/master)
+Windows: [![Build Status](https://ci.appveyor.com/api/projects/status/github/jverzani/ImplicitEquations.jl?branch=master&svg=true)](https://ci.appveyor.com/project/jverzani/sympy-jl)
 
 # ImplicitEquations
 
