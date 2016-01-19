@@ -92,7 +92,7 @@ Base.(:|)(r1::Pred, r2::Pred) = Preds([r1,r2], Any[|])
 
 Base.(:&)(ps::Preds, r1::Pred) = Preds([ps.ps, r1], [ps.ops, &])
 Base.(:&)(r1::Pred, ps::Preds) = ps & r1
-Base.(:|)(ps::Preds, r1::Pred) = Preds([ps.ps, r1], [ps.ops, |])
+Base.(:|)(ps::Preds, r1::Pred) = Preds(vcat(ps.ps, r1), vcat(ps.ops, |))
 Base.(:|)(r1::Pred, ps::Preds) = ps | r1
 
 
