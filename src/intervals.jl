@@ -3,8 +3,8 @@
 Base.isless{T<:Real, S<:Real}(i::Interval{T}, j::Interval{S}) = isless(i.hi, j.lo)
 Base.(:<=){T<:Real, S<:Real}(i::Interval{T}, j::Interval{S}) = <=(i.hi, j.lo)
 
-Base.max(i::Interval, j::Interval) = Interval(max(i.lo,j.lo), max(i.hi,j.hi))
-Base.min(i::Interval, j::Interval) = Interval(min(i.lo,j.lo), min(i.hi,j.hi))
+#Base.max(i::Interval, j::Interval) = Interval(max(i.lo,j.lo), max(i.hi,j.hi))
+#Base.min(i::Interval, j::Interval) = Interval(min(i.lo,j.lo), min(i.hi,j.hi))
 
 
 
@@ -218,7 +218,7 @@ function Base.log(x::OInterval)
         OInterval(log(x.val), x.def, x.cont)
     end
 end
-Base.log(k::MathConst{:e},x::OInterval) = log(x)
+Base.log(k::Irrational{:e},x::OInterval) = log(x)
 Base.log(k::Real, x::OInterval) = log(x)/log(k)
 
 function Base.(:^)(a::OInterval, x::OInterval)

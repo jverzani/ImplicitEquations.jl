@@ -59,7 +59,7 @@ function GRAPH(r, L, R, B, T, W, H)
     k = min(floor(Integer,log2(W)), floor(Integer,log2(H))) # largest square is size 2^k x 2^k
 
     reds = [Region(OInterval(u[1], u[2]), OInterval(u[3], u[4])) for u in rects]
-    @compat sizehint!(reds, W)
+    sizehint!(reds, W)
     
     red = Region[]         # 1-pixel red, can't decide via check_continuity
     black = Region[]
