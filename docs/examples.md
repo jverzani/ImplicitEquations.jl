@@ -53,13 +53,10 @@ plot(eq(f,g)) ## aka f ⩵ g (using Unicode\Equal<tab>)
 
 Inequalities can be graphed as well
 
-#```
-#f(x,y)= (y-5)*cos(4*sqrt((x-4)^2 + y^2))
-#g(x,y) = x*sin(2*sqrt(x^2 + y^2))
-#r = f < g
-#plot(r, (-10, 10), (-10, 10), W=2^4, H=2^4, show_red=true)  # xmin, xmax, ymin, ymax, pixels_wide, p#ixels_height
-#```
-
+```
+f(x,y) = x -y
+plot(f < 0)
+```
 
 
 The coloring scheme employed (mostly) follows Tupper and is based on pixels:
@@ -75,8 +72,7 @@ predicate `r` within the pixel. The `plot` method has the argument
 `show_red=true` to show these, otherwise they render as white.
 
 
-(In the above pixel does not refer to screen pixels for all the
-graphical outputs, only for a few.)
+(In the above "pixel" does not refer to screen pixels, but rather the  rectangular portions specified through `W` and `H`.)
 
 
 This graph illustrates the algorithm employed here in the graph of the $\sqrt{x}$

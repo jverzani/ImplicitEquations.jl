@@ -23,7 +23,8 @@ The
 is graphed over the default region as follows:
 
 ```
-using Winston   # or PyPlot, Gadfly
+using Plots
+gadfly()                 # other backends are possible.
 using ImplicitEquations
 
 a,b = -1,2
