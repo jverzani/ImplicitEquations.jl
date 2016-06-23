@@ -364,11 +364,11 @@ function cross_zero(r::Pred, u::Region, L, R, B, T, W, H)
 end
 
 
-"
+"""
 
 Does this function have a value in the pixel satisfying the inequality? Return `TRUE` or `MAYBE`.
 
-"
+"""
 function check_inequality(r::Pred, u::Region, L, R, B, T, W, H)
     x, y = xy_region(u, L, R, B, T, W, H)
     dx, dy = diam(x), diam(y)

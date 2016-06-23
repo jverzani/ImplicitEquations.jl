@@ -18,7 +18,7 @@ is graphed over the default region as follows:
 
 ```
 using Plots, ImplicitEquations
-gadfly()
+pyplot()
 
 a,b = -1,2
 f(x,y) = y^4 - x^4 + a*y^2 + b*x^2

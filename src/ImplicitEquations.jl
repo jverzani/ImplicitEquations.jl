@@ -5,19 +5,19 @@ module ImplicitEquations
 using ValidatedNumerics
 
 import ValidatedNumerics: Interval, diam
-using Plots
-import Plots.plot
+using RecipesBase
+
 
 include("predicates.jl")
 include("intervals.jl")
 include("tupper.jl")
 include("asciigraphs.jl")
-include("plot.jl")
+#include("plot.jl")
+include("plot_recipe.jl")
 
 export eq, neq, ⩵, ≷, ≶
 export screen, I_
 export asciigraph
-export plot
 
 #export GRAPH, OInterval
 #export Region, compute, negate_op

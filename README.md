@@ -1,4 +1,3 @@
-[![ImplicitEquations](http://pkg.julialang.org/badges/ImplicitEquations_0.3.svg)](http://pkg.julialang.org/?pkg=ImplicitEquations&ver=0.3)
 [![ImplicitEquations](http://pkg.julialang.org/badges/ImplicitEquations_0.4.svg)](http://pkg.julialang.org/?pkg=ImplicitEquations&ver=0.4)
 &nbsp;
 Linux: [![Build Status](https://travis-ci.org/jverzani/ImplicitEquations.jl.svg?branch=master)](https://travis-ci.org/jverzani/ImplicitEquations.jl)
@@ -24,7 +23,7 @@ is graphed over the default region as follows:
 
 ```
 using Plots
-gadfly()                 # other backends are possible.
+pyplot()
 using ImplicitEquations
 
 a,b = -1,2

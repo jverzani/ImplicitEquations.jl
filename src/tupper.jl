@@ -5,7 +5,7 @@
 ## Helper function to find initial partition into squares
 function fill_bottom(W,H)
     k = min(floor(Integer,log2(W)), floor(Integer, log2(H)))
-    rects = Any[]
+    rects = Any[] # Array{Int,1}[] #
 
     ## fill in
     w,h = 0, 2^k
@@ -30,7 +30,7 @@ end
 
 ## Helper function to break a rectangle into squares of size 2^j x 2^j
 function break_into_squares(W, H)
-    rects = Any[]
+    rects = Any[] # Array{Int,1}[] #
     offset = 0
 
     while H - offset > 0
