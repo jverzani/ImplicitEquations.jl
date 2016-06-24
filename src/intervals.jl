@@ -69,7 +69,9 @@ immutable Region
     x::OInterval
     y::OInterval
 end
-call(f::Function, u::Region) = f(u.x, u.y)
+
+## not good for v0.5+
+#call(f::Function, u::Region) = f(u.x, u.y)
 
 
 ValidatedNumerics.diam(x::OInterval) = diam(x.val)
