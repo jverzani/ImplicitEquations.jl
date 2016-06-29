@@ -7,7 +7,7 @@ using ValidatedNumerics
 
 import ValidatedNumerics: Interval, diam
 using RecipesBase
-
+using Compat
 
 include("predicates.jl")
 include("intervals.jl")

@@ -1,7 +1,12 @@
+
+import Base: <, <=, ==, !==, >=, >,
+             &, |, !, ==,
+             +, -, *, /, ^
+
 ## a few definitionsn for ValidatedNumerics that don't fit in there:
 ## Validated numerics doesn't define these, as the order ins't a total order 
 Base.isless{T<:Real, S<:Real}(i::Interval{T}, j::Interval{S}) = isless(i.hi, j.lo)
-Base.(:<=){T<:Real, S<:Real}(i::Interval{T}, j::Interval{S}) = <=(i.hi, j.lo)
+<={T<:Real, S<:Real}(i::Interval{T}, j::Interval{S}) = <=(i.hi, j.lo)
 
 #Base.max(i::Interval, j::Interval) = Interval(max(i.lo,j.lo), max(i.hi,j.hi))
 #Base.min(i::Interval, j::Interval) = Interval(min(i.lo,j.lo), min(i.hi,j.hi))
@@ -28,10 +33,10 @@ const MAYBE = BInterval(false, true)
 Base.convert(::Type{BInterval}, y::Bool) = y ? TRUE : FALSE
 Base.promote_rule(::Type{BInterval}, ::Type{Bool}) = BInterval
 
-Base.(:&)(x::BInterval, y::BInterval) = BInterval(x.lo & y.lo, x.hi & y.hi)
-Base.(:|)(x::BInterval, y::BInterval) = BInterval(x.lo | y.lo, x.hi | y.hi)
-Base.(:!)(x::BInterval) = BInterval(!x.lo, !x.hi)
-Base.(:(==))(x::BInterval, y::BInterval) = (x.lo==y.lo)&&(x.hi==y.hi)
+(&)(x::BInterval, y::BInterval) = BInterval(x.lo & y.lo, x.hi & y.hi)
+(|)(x::BInterval, y::BInterval) = BInterval(x.lo | y.lo, x.hi | y.hi)
+(!)(x::BInterval) = BInterval(!x.lo, !x.hi)
+==(x::BInterval, y::BInterval) = (x.lo==y.lo)&&(x.hi==y.hi)
 
 ## ...
 function negate_op(op)
@@ -52,7 +57,7 @@ immutable OInterval <: Real
     OInterval(val, def, cont) = new(val, def, cont)
 end
 
-Base.writemime(io::IO, ::MIME"text/plain", o::OInterval)  = print(io, "OInterval: ", o.val, " def=", o.def, " cont=",o.cont)
+@compat Base.show(io::IO,  o::OInterval)  = print(io, "OInterval: ", o.val, " def=", o.def, " cont=",o.cont)
 
 ## some outer constructors...
 OInterval{T <: Real, S <: Real}(a::T, b::S) = OInterval(ValidatedNumerics.Interval(a,b), TRUE, TRUE)
@@ -80,9 +85,9 @@ ValidatedNumerics.diam(x::OInterval) = diam(x.val)
 ## Notice these return BIntervals -- not Bools
 ##  bypass isless...
 
-Base.(:<)(i::OInterval, j::OInterval)  = i.val <  j.val ? TRUE : (i.val > j.val ? FALSE : MAYBE)
-Base.(:<=)(i::OInterval, j::OInterval) = i.val <= j.val ? TRUE : (i.val > j.val ? FALSE : MAYBE)
-Base.(:(==))(i::OInterval, j::OInterval) =
+<(i::OInterval, j::OInterval)  = i.val <  j.val ? TRUE : (i.val > j.val ? FALSE : MAYBE)
+<=(i::OInterval, j::OInterval) = i.val <= j.val ? TRUE : (i.val > j.val ? FALSE : MAYBE)
+==(i::OInterval, j::OInterval) =
     if i.val == j.val
         TRUE
     elseif (i < j) == TRUE
@@ -92,9 +97,9 @@ Base.(:(==))(i::OInterval, j::OInterval) =
     else
         MAYBE
     end
-Base.(:(!==))(i::OInterval, j::OInterval) = (i < j == TRUE) ? TRUE : ((i > j ==TRUE) ? TRUE : MAYBE)
-Base.(:>=)(i::OInterval, j::OInterval) = j < i
-Base.(:>)(i::OInterval, j::OInterval) = j <= i
+!==(i::OInterval, j::OInterval) = (i < j == TRUE) ? TRUE : ((i > j ==TRUE) ? TRUE : MAYBE)
+>=(i::OInterval, j::OInterval) = j < i
+>(i::OInterval, j::OInterval) = j <= i
 
 
 """
@@ -114,22 +119,22 @@ const I_ = screen               # indicator function like!
 
 ## Functions which are continuous everywhere
 ## +, -, *, sin, cos, ...
-function Base.(:+)(x::OInterval, y::OInterval)
+function +(x::OInterval, y::OInterval)
     val = x.val + y.val
     def = x.def & y.def
     cont = x.cont & y.cont
     OInterval(val, def, cont)
 end
 
-function Base.(:-)(x::OInterval, y::OInterval)
+function -(x::OInterval, y::OInterval)
     val = x.val - y.val
     def = x.def & y.def
     cont = x.cont & y.cont
     OInterval(val, def, cont)
 end
-Base.(:-)(x::OInterval) = OInterval(-x.val, x.def, x.cont)
+-(x::OInterval) = OInterval(-x.val, x.def, x.cont)
 
-function Base.(:*)(x::OInterval, y::OInterval)
+function *(x::OInterval, y::OInterval)
     val = x.val * y.val
     def = x.def & y.def
     cont = x.cont & y.cont
@@ -200,7 +205,7 @@ Base.exp(x::OInterval) = OInterval(exp(x.val), x.def, x.cont)
 
 ## /
 ## division is slow
-function Base.(:/)(x::OInterval, y::OInterval)
+function /(x::OInterval, y::OInterval)
     ## 0 is the issue. 
     if 0.0 ∈ y.val
         ## maybe defined, maybe continuous
@@ -223,18 +228,18 @@ end
 Base.log(k::Irrational{:e},x::OInterval) = log(x)
 Base.log(k::Real, x::OInterval) = log(x)/log(k)
 
-function Base.(:^)(a::OInterval, x::OInterval)
+function ^(a::OInterval, x::OInterval)
     OInterval(a.val^x.val, x.def, x.cont)
 end
 
 ## x^n
-function Base.(:^)(x::OInterval, n::Integer)
+function ^(x::OInterval, n::Integer)
     OInterval(x.val^n, x.def, x.cont)
 end
 
 ## Rational ones can be exact, whereas floating point exponents are not. The main
 ## example would be `x^(1/3)` and `x^(1//3)`
-function Base.(:^)(x::OInterval, q::Rational)
+function ^(x::OInterval, q::Rational)
     q < 0 && return(1/x^(-q))
     ## clean up odd denominator
     if isodd(q.den)
@@ -247,7 +252,7 @@ function Base.(:^)(x::OInterval, q::Rational)
     OInterval(val, x.def, x.cont)
 end
 
-function Base.(:^)(x::OInterval, r::Real)
+function ^(x::OInterval, r::Real)
     r < 0 && return(1/x^(-r))
     if x.val.hi < 0
         OInterval(x.val, BInterval(false, false), x.cont)

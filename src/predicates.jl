@@ -2,6 +2,7 @@
 
 #f(x,y) < 0 or f(x,y) == 0
 
+import Base: <, <=, ==, !=, !==, >=, >, &, |, !
 
 abstract Predicate
 
@@ -34,13 +35,13 @@ type Pred <: Predicate
 end
 
 ## meta these
-Base.(:<)(f::Function, x::Real) = Pred(f, < , x) 
-Base.(:<)(f::Function, g::Function) = Pred((x,y) -> f(x,y) - g(x,y), < , 0)
+<(f::Function, x::Real) = Pred(f, < , x) 
+<(f::Function, g::Function) = Pred((x,y) -> f(x,y) - g(x,y), < , 0)
 
-Base.(:<=)(f::Function, x::Real) = Pred(f, <= , x)
-Base.(:<=)(f::Function, g::Function) = Pred((x,y) -> f(x,y) - g(x,y), <= , 0)
+<=(f::Function, x::Real) = Pred(f, <= , x)
+<=(f::Function, g::Function) = Pred((x,y) -> f(x,y) - g(x,y), <= , 0)
 
-Base.(:(==))(f::Function, x::Real) = Pred(f, == , x)
+==(f::Function, x::Real) = Pred(f, == , x)
 ## ==(f::Function, g::Function) this crosses up Gadfly and others so...
 eq(f::Function, g::Function) = Pred((x,y) -> f(x,y) - g(x,y), == , 0)
 ## unicode variants
@@ -48,7 +49,7 @@ eq(f::Function, g::Function) = Pred((x,y) -> f(x,y) - g(x,y), == , 0)
 ⩵(f::Function, g::Function) = eq(f,g)
 
 
-Base.(:(!=))(f::Function, x::Real) = Pred(f, != , x)
+!=(f::Function, x::Real) = Pred(f, != , x)
 neq(f::Function, g::Function) = Pred((x,y) -> f(x,y) - g(x,y), != , 0)
 
 ≶(x::Real, y::Real) = (x != y)
@@ -64,11 +65,11 @@ neq(f::Function, g::Function) = Pred((x,y) -> f(x,y) - g(x,y), != , 0)
 
 
 
-Base.(:>=)(f::Function, x::Real) = Pred(f, >= , x)
-Base.(:>=)(f::Function, g::Function) = Pred((x,y) -> f(x,y) - g(x,y), >= , 0)
+>=(f::Function, x::Real) = Pred(f, >= , x)
+>=(f::Function, g::Function) = Pred((x,y) -> f(x,y) - g(x,y), >= , 0)
 
-Base.(:>)(f::Function, x::Real) = Pred(f, > , x)
-Base.(:>)(f::Function, g::Function) = Pred((x,y) -> f(x,y) - g(x,y), > , 0)
+>(f::Function, x::Real) = Pred(f, > , x)
+>(f::Function, g::Function) = Pred((x,y) -> f(x,y) - g(x,y), > , 0)
 
 Base.isless(x::Real, f::Function) = (f >= x)
 Base.isless(f::Function, x::Real) = (f < x)
@@ -87,12 +88,12 @@ type Preds <: Predicate
 end
 
 ## Some algebra for Pred and Preds
-Base.(:&)(r1::Pred, r2::Pred) = Preds([r1,r2], Any[&])
-Base.(:|)(r1::Pred, r2::Pred) = Preds([r1,r2], Any[|])
+(&)(r1::Pred, r2::Pred) = Preds([r1,r2], Any[&])
+(|)(r1::Pred, r2::Pred) = Preds([r1,r2], Any[|])
 
-Base.(:&)(ps::Preds, r1::Pred) = Preds([ps.ps, r1], [ps.ops, &])
-Base.(:&)(r1::Pred, ps::Preds) = ps & r1
-Base.(:|)(ps::Preds, r1::Pred) = Preds(vcat(ps.ps, r1), vcat(ps.ops, |))
-Base.(:|)(r1::Pred, ps::Preds) = ps | r1
+(&)(ps::Preds, r1::Pred) = Preds([ps.ps, r1], [ps.ops, &])
+(&)(r1::Pred, ps::Preds) = ps & r1
+(|)(ps::Preds, r1::Pred) = Preds(vcat(ps.ps, r1), vcat(ps.ops, |))
+(|)(r1::Pred, ps::Preds) = ps | r1
 
 
