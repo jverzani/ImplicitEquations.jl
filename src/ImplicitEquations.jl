@@ -1,4 +1,5 @@
-__precompile__(false)
+__precompile__(true)
+
 module ImplicitEquations
 
 

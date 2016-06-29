@@ -20,10 +20,9 @@ again to determine if it is true, false, or still maybe. This repeats until `W` 
 can't be subdivided.
 
 
-The `plot`ting of a predicate simply plots each block that is knows satisfies the predicate "black" and optionally that is known *not*
-to satisfy the predicate "white." Optionally, the ambiguous blocks can be plotted in "red."
+The `plot`ting of a predicate simply plots each block that is knows satisfies the predicate "black" and each ambiguous block "red." By taking `m` and `n` larger the graphs look less "blocky" but take more time to render.
 
-For text-base plots, the `asciigraph` function is available.
+For text-based plots, the `asciigraph` function is available.
 
 
 Examples:
@@ -41,16 +40,16 @@ f(x,y) = x*y
 g(x,y) =c*x^3 + d*x^2 + e*x + h
 plot(eq(f,g), title="Trident of Newton") ## aka f ⩵ g (using Unicode\Equal[tab])
 
+## inequality
 f(x,y)= (y-5)*cos(4*sqrt((x-4)^2 + y^2))
 g(x,y) = x*sin(2*sqrt(x^2 + y^2))
 r = f < g
-plot(r, (-10, 10), (-10, 10), 9, 9, show_red=true)  # (xmin, xmax), (ymin, ymax),
-                                                    # n (2^n pixels_wide), m (2^m pixels_high)
+plot(r, (-10, 10), (-10, 10), N=9, M=9)  # (xmin, xmax), (ymin, ymax),
 ```
 """
 plot_implicit = nothing
 
-
+## Helpers to convert 
 linterp(A,B,a,b,W) = (a + A/W*(b-a),a + B/W*(b-a))
 
 function xyrange(u, L, R, B, T, W, H; offset=0)
@@ -58,86 +57,69 @@ function xyrange(u, L, R, B, T, W, H; offset=0)
           linterp(u.y.val.lo, u.y.val.hi + offset, B, T, H)...)
 end
 
-## one way to do this - -but requires Plots to load.
-## rect(x0, x1, y0, y1) = Plots.Shape([x0, x1, x1, x0], [y0,y0, y1, y1])
-## rs = [rect(ImplicitEquations.xyrange(u, L,R,B,T,W,H)...) for u in r]
-## seriescolor --> cols[:red]
-## rs
 
-
-## A plot recipe
-## TODO: get keyword arguments!
-@recipe function f(p::Predicate, x=(-5,5), y=(-5,5), # should be keyword arguments after here !!!
-                   n::Int=8, m::Int=8,               # 9/8 too slow
-                   show_red::Bool=true, show_white::Bool=false,
-                   cols=Dict(:red=>:red, :black=>:black, :white=>:white)
-                   )
-    
-    L, R = extrema(x)
-    B, T = extrema(y)
-    
-    W = 2^n
-    H = 2^m
-
-    r, b, w = ImplicitEquations.GRAPH(p, L, R, B, T, W, H)
-
-    ## could DRY this up
-   if show_red & length(r) > 0
-       @series begin
-           xs = Float64[]
-           ys = Float64[]
-           for u in r
-               x0,x1,y0,y1 = ImplicitEquations.xyrange(u, L,R,B,T,W,H)
-               append!(xs, [x0,x1,x1,x0,x0]); push!(xs, NaN)
-               append!(ys, [y0,y0,y1,y1,y0]); push!(ys, NaN)
-           end
-           pop!(xs); pop!(ys)
-           x := x
-           y := y
-           seriestype := :shape
-           markercolor := cols[:red]
-           markerstrokewidth := 0
-       end
-   end
-
-   if show_white & length(w) > 0
-       @series begin
-           xs = Float64[]
-           ys = Float64[]
-           for u in w
-               x0,x1,y0,y1 = ImplicitEquations.xyrange(u, L,R,B,T,W,H)
-               append!(xs, [x0,x1,x1,x0,x0]); push!(xs, NaN)
-               append!(ys, [y0,y0,y1,y1,y0]); push!(ys, NaN)
-           end
-           pop!(xs); pop!(ys)
-           x := x
-           y := y
-           seriestype := :shape
-           markercolor := cols[:white]
-           markerstrokewidth := 0
-           
-       end
-   end
-        
-
-
+function get_xs_ys(rs, L, R, B, T, W, H)
     xs = Float64[]
     ys = Float64[]
-    for u in b
+    for u in rs
         x0,x1,y0,y1 = ImplicitEquations.xyrange(u, L,R,B,T,W,H)
         append!(xs, [x0,x1,x1,x0,x0]); push!(xs, NaN)
         append!(ys, [y0,y0,y1,y1,y0]); push!(ys, NaN)
     end
     pop!(xs); pop!(ys)
+    xs, ys
+end
 
+
+
+
+## A plot recipe
+## x, y describe region to plot over
+## N, M give no. of pixels 2^N by 2^M
+## red and black are used for colors.
+@recipe function f(p::Predicate, x=(-5,5), y=(-5,5);
+                   N=8,
+                   M=8,              # oddly m as keyword fails. 9/8 too slow
+                   red=nothing,      # or :red ...
+                   black=:black
+                   )
+    
+    L, R = extrema(x)
+    B, T = extrema(y)
+
+    W = 2^N
+    H = 2^M
+
+    r, b, w = ImplicitEquations.GRAPH(p, L, R, B, T, W, H)
+
+    ## add red as a series
+    if length(r) > 0 && red != nothing
+        @series begin
+            xs, ys = get_xs_ys(r, L, R, B, T, W, H)
+            
+            seriestype := :shape
+            fillcolor := red
+            linewidth := 0
+            x := xs
+            y := ys
+            
+            ()
+        end
+    end
+
+    ## do black
     seriestype --> :shape
-    markercolor := cols[:black]    
-    markerstrokewidth --> 0
-    x --> xs
-    y --> ys
     xlims --> [L, R]
     ylims --> [B, T]
     legend --> false
+
+    fillcolor --> black
+    linewidth --> 0
+
+    xs, ys = get_xs_ys(b, L, R, B, T, W, H)
+    x --> xs
+    y --> ys
+    
     ()
     
 end

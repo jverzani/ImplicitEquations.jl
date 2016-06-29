@@ -11,6 +11,10 @@ the `julia` user to naturally represent and easily render graphs of
 implicit functions and equations.
 
 
+The basic idea is to express a equation in $x$ and $y$ variables in terms of a function of two variables as a predicate. The `plot` function `Plots` is used to plot these predicates.
+
+
+
 
 For example, the
 [Devils curve](http://www-groups.dcs.st-and.ac.uk/~history/Curves/Devils.html)
@@ -35,7 +39,7 @@ functions on the left and real values or functions on the right: `<`,
 `<=` (`\le<tab>`), `\Equal<tab>`, `\lessgtr<tab>`, `>=` (`\ge<tab>`),
 and `>` . As `==` and `!=` can already be used to compare functions in
 a different way, we use either `eq(f,g)` or `neq(f,g)` for these
-comparisons. Should infix notation be preferred, the Unicode operator
+comparisons. Should infix notation be preferred, the Unicode operators
 `f \Equal<tab> g` or `f \lessgtr<tab> g` may be used.
 
 For example, the
@@ -59,36 +63,51 @@ plot(f < 0)
 ```
 
 
-The coloring scheme employed (mostly) follows Tupper and is based on pixels:
-
-- if a pixel is white, there are no solutions of the predicate `r`
-within the pixel;
-
-- if a pixel is black, there is at least one solution of the predicate
-`r` within the pixel;
-
-- if a pixel is red, there may or may not be solutions of the
-predicate `r` within the pixel. The `plot` method has the argument
-`show_red=true` to show these, otherwise they render as white.
-
-
-(In the above "pixel" does not refer to screen pixels, but rather the  rectangular portions specified through `W` and `H`.)
-
-
-This graph illustrates the algorithm employed here in the graph of the $\sqrt{x}$
+This graph illustrates the algorithm employed to graph `f=0` where `f(x,y) = y - sqrt(x)`:
 
 ![Algorithm](http://i.imgur.com/8Mtmb7v.png)
 
 The basic algorithm is to initially break up the graphing region into
 square regions. (This uses the number of pixels, which are specified
-by `W` and `H` above.)  There regions are checked for the
-predicate. If definitely not, the region is painted white; if
-definitely yes, the region is painted black; else the square region is
-subdivided into 4 smaller regions and the above is repeated until
-subdivision would be below the pixel level. At which point, the
-remaining 1-by-1 pixels are checked for possible solutions, for
-example for equalities where continuity is known a random sample of
-points is investigated with the intermediate value theorem.
+by `W` and `H` above.)
+
+These regions are checked for the
+predicate.
+
+* If definitely not, the region is labeled "white;"
+* if definitely yes, the region is labeled "black;"
+* else the square region is subdivided into 4 smaller regions and the
+above is repeated until subdivision would be below the pixel level. At
+which point, the remaining 1-by-1 pixels are checked for possible
+solutions, for example for equalities where continuity is known a
+random sample of points is investigated with the intermediate value
+theorem. A region may be labeled "black" or "red" if the predicate is
+still ambiguous.
+
+
+The graph plots each "black" region as a "pixel". The "red" regions
+may optionally be colored, if a named color is passed through the
+keyword `red`.
+
+For example, the Devil's curve is a bit different with red coloring:
+
+```
+a,b = -1,2
+f(x,y) = y^4 - x^4 + a*y^2 + b*x^2
+r = (f==0)
+plot(r, red=:red)   # show undecided regions in red
+```
+
+
+
+The `plot` function accepts the usual keywords of `Plots` and also:
+
+* the region to plot over may be specified through: `plot(pred, (a,b), (c, d))`
+* the number of pixels is a power of 2 and specified by `plot(pred, N=4, M=5)`. The default is `M=8` by `N=8` or 256 x 256.
+* the colors red and black can be adjusted with the keywords `red` and `black`.
+
+
+
 
 
 This example, the
@@ -105,7 +124,7 @@ f4(x,y) = y - 2.25                 *   I_(abs(x) <= 1/2)
 f5(x,y) = (6 * sqrt(10)/7 + (1.5-.5 * abs(x)) - 6 * sqrt(10)/14 * sqrt(4-(abs(x)-1)^2) -y) * screen(abs(x) >= 1)
 
 r = (f0==0) | (f1==0) | (f2== 0) | (f3==0) | (f4==0) | (f5==0)
-plot(r, (-7, 7), (-4, 4))
+plot(r, (-7, 7), (-4, 4), red=:black)
 ```
 
 The above example illustrates a few things:
@@ -115,7 +134,7 @@ The above example illustrates a few things:
 * The `screen` function can be used to restrict values according to
   some predicate call.
 
-* the logical comparisons such as `(abs(x)>= 3/4) & (abs(x) <= 1)`
+* the logical comparisons such as `(abs(x) >= 3/4) & (abs(x) <= 1)`
   within `screen` are not typical in that one can't write `3/4 <=
   abs(x) <= 1`, a convenient `Julian` syntax. This is due to the fact that the "`x`s"
   being evaluated are not numbers, rather intervals via
@@ -130,6 +149,8 @@ The above example illustrates a few things:
   by slow, it can means really slow. The difference between rendering
   `(1-x^2)*(2-y^2)` and `csc(1-x^2)*cot(2-y^2)` can be 10 times.)
 
+  Use the keyword arguments `N` and `M` to control the number of pixels: `W = 2^N, H=2^M`.
+
 ## A "typical" application
 
 A common calculus problem is to find the tangent line using implicit
@@ -143,12 +164,8 @@ plot(f == 2*3^2)
 a,b = 3,3
 dydx(a,b) = -b/a             # implicit differentiate to get dy/dx =-y/x
 tl(x) = b + dydx(a,b)*(x-a)  
-plot!(tl, -5, 5)
+plot!(tl, linewidth=3)
 ```
-
-## Display
-
-This package uses the `Plots` package to create graphics for different backends. 
 
 
 ## Alternatives
