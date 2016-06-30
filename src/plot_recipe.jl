@@ -66,7 +66,14 @@ function get_xs_ys(rs, L, R, B, T, W, H)
         append!(xs, [x0,x1,x1,x0,x0]); push!(xs, NaN)
         append!(ys, [y0,y0,y1,y1,y0]); push!(ys, NaN)
     end
-    pop!(xs); pop!(ys)
+    if length(xs) > 0
+        pop!(xs)
+        pop!(ys)
+    else
+        xs = Float64[NaN]
+        ys = Float64[NaN]
+    end
+
     xs, ys
 end
 

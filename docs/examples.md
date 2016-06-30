@@ -58,12 +58,21 @@ plot(eq(f,g)) ## aka f ⩵ g (using Unicode\Equal<tab>)
 Inequalities can be graphed as well
 
 ```
-f(x,y) = x -y
+f(x,y) = x - y
 plot(f < 0)
 ```
 
+This example is from Tupper's paper:
 
-This graph illustrates the algorithm employed to graph `f=0` where `f(x,y) = y - sqrt(x)`:
+```
+f(x,y) = (y-5)* cos(4sqrt((x-4)^2 +y^2))
+g(x,y) = x * sin(2*sqrt(x^2 + y^2))
+
+plot(f > g, (-10, 10), (-10, 10))
+```
+
+
+This graph illustrates the algorithm employed to graph `f == 0` where `f(x,y) = y - sqrt(x)`:
 
 ![Algorithm](http://i.imgur.com/8Mtmb7v.png)
 
@@ -78,7 +87,7 @@ predicate.
 * if definitely yes, the region is labeled "black;"
 * else the square region is subdivided into 4 smaller regions and the
 above is repeated until subdivision would be below the pixel level. At
-which point, the remaining 1-by-1 pixels are checked for possible
+which point, the remaining "1-by-1" pixels are checked for possible
 solutions, for example for equalities where continuity is known a
 random sample of points is investigated with the intermediate value
 theorem. A region may be labeled "black" or "red" if the predicate is
@@ -146,10 +155,9 @@ The above example illustrates a few things:
   lot of checking, such as the inequality above, are slow just because
   more regions must be analyzed. As well, some operations are slow,
   such as division, as adjustments for discontinuities are slow. (And
-  by slow, it can means really slow. The difference between rendering
+  by slow, it can mean really slow. The difference between rendering
   `(1-x^2)*(2-y^2)` and `csc(1-x^2)*cot(2-y^2)` can be 10 times.)
 
-  Use the keyword arguments `N` and `M` to control the number of pixels: `W = 2^N, H=2^M`.
 
 ## A "typical" application
 
