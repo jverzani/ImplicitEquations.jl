@@ -9,7 +9,12 @@ abstract Predicate
 """
 
 A predicate is defined in terms of a function of two variables, an
-inquality, and either another function or a real number.  For example,
+inquality, and either another function or a real number. 
+They are conveniently created by the functions `Lt`, `Le`, `Eq`, `Neq`, `Ge`, and `Gt`. The unicode operators
+`≪` (`\ll[tab]`), `≦` (`\leqq[tab]`), `⩵` (`\Equal[tab]`), `≶` (`\lessgtr[tab]`)  or `≷` (`\gtrless[tab]`), `≧` (`\geqq[tab]`), `≫` (`\leqq[tab]`),
+
+
+ For example,
 `f < 0` or `f >= g`. The case `f==g` and `f != g` are not defined, as doing so crosses
 up `Gadfly` and other code that compares functions for equality. Use
 `eq(f,g)`  or `f \Equal<tab> g` for equality and `neq(f,g)` or `f \gtrless<tab> g` for not equal.
@@ -34,31 +39,58 @@ type Pred <: Predicate
     val
 end
 
+
 ## meta these
-<(f::Function, x::Real) = Pred(f, < , x) 
-<(f::Function, g::Function) = Pred((x,y) -> f(x,y) - g(x,y), < , 0)
+preds = [(:Lt, :≪, :<), # \ll
+         (:Le, :≦, :<=), # \leqq
+         (:Eq, :⩵, :(==)), # \Equal
+         (:Ge, :≧, :>=), # \gegg
+         (:Gt, :≫, :>) # \gg
+         ]
 
-<=(f::Function, x::Real) = Pred(f, <= , x)
-<=(f::Function, g::Function) = Pred((x,y) -> f(x,y) - g(x,y), <= , 0)
+for (fn, uop, op) in preds
+    fnname =  string(fn)
+    @eval begin
+        @doc """
+    `$($fnname)`: Create predicate for plotting. 
+The operators are `Lt` (≪, \ll[tab]), `Le` (≦ \leqq[tab]), `Ge` (≧ \geqq[tab]), `Gt` (≫ \gg[tab]), 
+`Eq` (⩵ \Equal[tab]), or `Neq` (≷ \gtrless[tab] or ≶ \lessgtr[tab]).
+""" ->
+        ($fn)(f::Function, x::Real) = Pred(f, $op, x)
+        ($uop)(f::Function, x::Real) = ($fn)(f, x)
+        ($fn)(f::Function, g::Function) = $(fn)((x,y) -> f(x,y) - g(x,y), 0)
+        ($uop)(f::Function, g::Function) = ($fn)(f, g)
+    end
+    eval(Expr(:export, fn))
+    eval(Expr(:export, uop))
+end
 
-==(f::Function, x::Real) = Pred(f, == , x)
-## ==(f::Function, g::Function) this crosses up Gadfly and others so...
-eq(f::Function, g::Function) = Pred((x,y) -> f(x,y) - g(x,y), == , 0)
-## unicode variants
-⩵(f::Function, x::Real) =  f == x
-⩵(f::Function, g::Function) = eq(f,g)
+# <(f::Function, x::Real) = Pred(f, < , x) 
+# <(f::Function, g::Function) = Pred((x,y) -> f(x,y) - g(x,y), < , 0)
 
 
-!=(f::Function, x::Real) = Pred(f, != , x)
-neq(f::Function, g::Function) = Pred((x,y) -> f(x,y) - g(x,y), != , 0)
+
+# <=(f::Function, x::Real) = Pred(f, <= , x)
+# <=(f::Function, g::Function) = Pred((x,y) -> f(x,y) - g(x,y), <= , 0)
+
+# ==(f::Function, x::Real) = Pred(f, == , x)
+# ## ==(f::Function, g::Function) this crosses up Gadfly and others so...
+# eq(f::Function, g::Function) = Pred((x,y) -> f(x,y) - g(x,y), == , 0)
+# ## unicode variants
+# ⩵(f::Function, x::Real) =  f == x
+# ⩵(f::Function, g::Function) = eq(f,g)
+
+
+Neq(f::Function, x::Real) = Pred(f, != , x)
+Neq(f::Function, g::Function) = Neq((x,y) -> f(x,y) - g(x,y), 0)
 
 ≶(x::Real, y::Real) = (x != y)
-≶(f::Function, x::Real) = (f != x)
-≶(f::Function, g::Function) = neq(f, g)
+≶(f::Function, x::Real) = Neq(f, x)
+≶(f::Function, g::Function) = Neq(f, g)
 
 ≷(x::Real, y::Real) = (x != y)
-≷(f::Function, x::Real) = (f != x)
-≷(f::Function, g::Function) = neq(f, g)
+≷(f::Function, x::Real) = Neq(f, x)
+≷(f::Function, g::Function) = Neq(f, g)
 
 
 

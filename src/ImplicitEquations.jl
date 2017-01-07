@@ -3,9 +3,8 @@ __precompile__(true)
 module ImplicitEquations
 
 
-using ValidatedNumerics
-
-import ValidatedNumerics: Interval, diam
+using ForwardDiff
+import ValidatedNumerics: Interval, diam, isempty
 using RecipesBase
 using Compat
 
@@ -16,7 +15,7 @@ include("asciigraphs.jl")
 #include("plot.jl")
 include("plot_recipe.jl")
 
-export eq, neq, ⩵, ≷, ≶
+export Lt, ≪, Le, ≦, Eq, ⩵, Neq, ≶, ≷, Ge, ≧, Gt, ≫
 export screen, I_
 export asciigraph
 

@@ -116,7 +116,7 @@ function check_continuity(r::Pred, u, L, R, B, T, W, H)
     fxy = compute_fxy(r, u,  L, R, B, T, W, H)
 
     ## check for NaN
-    if ValidatedNumerics.isempty(fxy.val)
+    if isempty(fxy.val)
         return(FALSE)
     end
     if (fxy.def == FALSE) || (fxy.def == MAYBE)
@@ -125,7 +125,7 @@ function check_continuity(r::Pred, u, L, R, B, T, W, H)
     
     ## now check continuity,
     val = FALSE
-    if (fxy.cont == TRUE) && ((r.op === ==) || (r.op === eq) || (r.op === ⩵) || (r.op === <=) || (r.op === >=))
+    if (fxy.cont == TRUE) && ((r.op === ==) || (r.op === <=) || (r.op === >=))
         ## use intermediate value theorem here
         val = val | cross_zero(r, u, L, R, B, T, W, H)
         

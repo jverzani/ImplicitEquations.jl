@@ -60,13 +60,14 @@ end
 @compat Base.show(io::IO,  o::OInterval)  = print(io, "OInterval: ", o.val, " def=", o.def, " cont=",o.cont)
 
 ## some outer constructors...
-OInterval{T <: Real, S <: Real}(a::T, b::S) = OInterval(ValidatedNumerics.Interval(a,b), TRUE, TRUE)
+OInterval{T <: Real, S <: Real}(a::T, b::S) = OInterval(Interval(a,b), TRUE, TRUE)
 OInterval(a::OInterval, b::OInterval) = a === a ? a : error("a is not b?") ## why is this one necessary?
 OInterval(a) = OInterval(a,a)   # thin one...
 OInterval(i::Interval) = OInterval(i.lo, i.hi)
 
 Base.convert(::Type{OInterval}, i::Interval) = OInterval(i.lo, i.hi)
 Base.convert{S<:Real}(::Type{OInterval}, x::S) = OInterval(x)
+Base.promote_rule{N,B<:Real}(::Type{OInterval}, ::Type{ForwardDiff.Dual{N,B}}) = warn("defined to remove ambiguity")
 Base.promote_rule{A<:Real}(::Type{OInterval}, ::Type{A}) = OInterval
 
 ## A region is two OIntervals.
@@ -79,7 +80,8 @@ end
 #call(f::Function, u::Region) = f(u.x, u.y)
 
 
-ValidatedNumerics.diam(x::OInterval) = diam(x.val)
+#ValidatedNumerics.diam(x::OInterval) = diam(x.val)
+diam(x::OInterval) = diam(x.val)
 
 ## extend functions for OInterval
 ## Notice these return BIntervals -- not Bools
@@ -252,6 +254,7 @@ function ^(x::OInterval, q::Rational)
     OInterval(val, x.def, x.cont)
 end
 
+^(x::OInterval, r::ForwardDiff.Dual) = warn("defined to resolve ambiguity")
 function ^(x::OInterval, r::Real)
     r < 0 && return(1/x^(-r))
     if x.val.hi < 0
@@ -320,8 +323,8 @@ function compute(p::Pred, u::Region, L, R, B, T, W, H)
     fxy = compute_fxy(p, u, L, R, B, T, W, H)
 
     (fxy.def == FALSE) && return (FALSE)
-    ValidatedNumerics.isempty(fxy.val) && return (FALSE & fxy.def)
-
+    isempty(fxy.val) && return (FALSE & fxy.def)
+    
     if p.op === ==
         return((p.val ∈ fxy.val) ? MAYBE : FALSE)
     elseif negate_op(p.op) === ==
