@@ -12,7 +12,6 @@ include("predicates.jl")
 include("intervals.jl")
 include("tupper.jl")
 include("asciigraphs.jl")
-#include("plot.jl")
 include("plot_recipe.jl")
 
 export Lt, ≪, Le, ≦, Eq, ⩵, Neq, ≶, ≷, Ge, ≧, Gt, ≫

@@ -84,15 +84,21 @@ end
 ## x, y describe region to plot over
 ## N, M give no. of pixels 2^N by 2^M
 ## red and black are used for colors.
-@recipe function f(p::Predicate, x=(-5,5), y=(-5,5);
+@recipe function f(p::Predicate; #, x=(-5,5), y=(-5,5);
                    N=8,
                    M=8,              # oddly m as keyword fails. 9/8 too slow
                    red=nothing,      # or :red ...
                    black=:black
                    )
     
-    L, R = extrema(x)
-    B, T = extrema(y)
+#    L, R = extrema(x)
+#    B, T = extrema(y)
+
+    xlims = get(d,:xlims, (-5,5))
+    ylims = get(d, :ylims, (-5,5))
+
+    L, R = extrema(xlims)
+    B, T = extrema(ylims)
 
     W = 2^N
     H = 2^M
@@ -116,8 +122,8 @@ end
 
     ## do black
     seriestype --> :shape
-    xlims --> [L, R]
-    ylims --> [B, T]
+#    xlims --> [L, R]
+#    ylims --> [B, T]
     legend --> false
 
     fillcolor --> black

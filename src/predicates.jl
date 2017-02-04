@@ -11,7 +11,7 @@ abstract Predicate
 A predicate is defined in terms of a function of two variables, an
 inquality, and either another function or a real number. 
 They are conveniently created by the functions `Lt`, `Le`, `Eq`, `Neq`, `Ge`, and `Gt`. The unicode operators
-`≪` (`\ll[tab]`), `≦` (`\leqq[tab]`), `⩵` (`\Equal[tab]`), `≶` (`\lessgtr[tab]`)  or `≷` (`\gtrless[tab]`), `≧` (`\geqq[tab]`), `≫` (`\leqq[tab]`),
+`≪` (`\ll[tab]`), `≦` (`\leqq[tab]`), `⩵` (`\Equal[tab]`), `≶` (`\lessgtr[tab]`)  or `≷` (`\gtrless[tab]`), `≧` (`\geqq[tab]`), `≫` (`\leqq[tab]`) may also be used.
 
 
  For example,
