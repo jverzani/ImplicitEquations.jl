@@ -2,11 +2,11 @@ __precompile__(true)
 
 module ImplicitEquations
 
-
-using ForwardDiff
+#using ForwardDiff
+using ValidatedNumerics
 import ValidatedNumerics: Interval, diam, isempty
 using RecipesBase
-using Compat
+#using Compat
 
 include("predicates.jl")
 include("intervals.jl")

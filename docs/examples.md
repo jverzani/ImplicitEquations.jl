@@ -185,7 +185,7 @@ interval arithmetic, as possible.
 
 The package
 [IntervalConstraintProgramming ](https://github.com/dpsanders/IntervalConstraintProgramming.jl)
-also allows for this type of graphing, and momre.
+also allows for this type of graphing and more.
 
 ## TODO
 

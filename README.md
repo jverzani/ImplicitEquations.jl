@@ -34,3 +34,11 @@ plot(f ⩵ 0)  # \Equal[tab]
 ![DevilsCurve](http://i.imgur.com/LChTzC1.png)
 
 
+### See also:
+
+
+The package
+[IntervalConstraintProgramming ](https://github.com/dpsanders/IntervalConstraintProgramming.jl)
+offers a faster, more general implentation of this type of graphing
+and more. It has a different means to specify the underlying
+equation. 

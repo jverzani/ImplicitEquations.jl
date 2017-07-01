@@ -2,83 +2,99 @@
 
 #f(x,y) < 0 or f(x,y) == 0
 
-import Base: <, <=, ==, !=, !==, >=, >, &, |, !
+import Base: <, <=, ==, !=, !==, >=, >
+import Base: &, |, !
 
-abstract Predicate
+abstract type Predicate{T} end
 
 """
 
 A predicate is defined in terms of a function of two variables, an
-inquality, and either another function or a real number. 
+inequality, and either another function or a real number. 
 They are conveniently created by the functions `Lt`, `Le`, `Eq`, `Neq`, `Ge`, and `Gt`. The unicode operators
 `≪` (`\ll[tab]`), `≦` (`\leqq[tab]`), `⩵` (`\Equal[tab]`), `≶` (`\lessgtr[tab]`)  or `≷` (`\gtrless[tab]`), `≧` (`\geqq[tab]`), `≫` (`\leqq[tab]`) may also be used.
 
-
- For example,
-`f < 0` or `f >= g`. The case `f==g` and `f != g` are not defined, as doing so crosses
-up `Gadfly` and other code that compares functions for equality. Use
-`eq(f,g)`  or `f \Equal<tab> g` for equality and `neq(f,g)` or `f \gtrless<tab> g` for not equal.
-
-Available operations to produce predicates:
-
-* `<`
-* `<=`, `≤` (`\le<tab>`)
-* `==` (`Function == Real`), `eq(f,g)`, `⩵` (`\Equal<tab>`)
-* `!==` (`Function != Real`), `neq(f,g)`, `≷` (`\gtrless<tab>`), `≶` (`\lessgtr<tab>`)
-* `>=`, `≥` (`\ge<tab>`)
-* `>`
 
 To combine predicates, `&` and `|` can be used.
 
 To negate a predicate, `!` is used.
 
 """
-type Pred <: Predicate
+struct Pred{T} <: Predicate{T}
     f::Function
-    op
-    val
+    op::Function
+    val::T
 end
+# could metaprogram these, but had issue with Gt and Ge.
+"""
+    `Lt(f, x)` or `f ≪ x`
+    
+Create predicate for plotting. 
 
-
-## meta these
-preds = [(:Lt, :≪, :<), # \ll
-         (:Le, :≦, :<=), # \leqq
-         (:Eq, :⩵, :(==)), # \Equal
-         (:Ge, :≧, :>=), # \gegg
-         (:Gt, :≫, :>) # \gg
-         ]
-
-for (fn, uop, op) in preds
-    fnname =  string(fn)
-    @eval begin
-        @doc """
-    `$($fnname)`: Create predicate for plotting. 
 The operators are `Lt` (≪, \ll[tab]), `Le` (≦ \leqq[tab]), `Ge` (≧ \geqq[tab]), `Gt` (≫ \gg[tab]), 
 `Eq` (⩵ \Equal[tab]), or `Neq` (≷ \gtrless[tab] or ≶ \lessgtr[tab]).
-""" ->
-        ($fn)(f::Function, x::Real) = Pred(f, $op, x)
-        ($uop)(f::Function, x::Real) = ($fn)(f, x)
-        ($fn)(f::Function, g::Function) = $(fn)((x,y) -> f(x,y) - g(x,y), 0)
-        ($uop)(f::Function, g::Function) = ($fn)(f, g)
-    end
-    eval(Expr(:export, fn))
-    eval(Expr(:export, uop))
-end
-
-# <(f::Function, x::Real) = Pred(f, < , x) 
-# <(f::Function, g::Function) = Pred((x,y) -> f(x,y) - g(x,y), < , 0)
+"""
+Lt(f::Function, x::Real) = Pred(f, <, x)
+≪(f::Function, x::Real) = Lt(f, x)
+Lt(f::Function, g::Function) = Lt((x,y) -> f(x,y) - g(x,y), 0)
+≪(f::Function, g::Function) = Lt(f,g)
 
 
+"""
+    `Le(f, x)` or `f ≦ x`
+    
+Create predicate for plotting. 
 
-# <=(f::Function, x::Real) = Pred(f, <= , x)
-# <=(f::Function, g::Function) = Pred((x,y) -> f(x,y) - g(x,y), <= , 0)
+The operators are `Lt` (≪, \ll[tab]), `Le` (≦ \leqq[tab]), `Ge` (≧ \geqq[tab]), `Gt` (≫ \gg[tab]), 
+`Eq` (⩵ \Equal[tab]), or `Neq` (≷ \gtrless[tab] or ≶ \lessgtr[tab]).
+"""
+Le(f::Function, x::Real) = Pred(f, <=, x)
+≦(f::Function, x::Real) = Le(f, x)
+Le(f::Function, g::Function) = Le((x,y) -> f(x,y) - g(x,y), 0)
+≦(f::Function, g::Function) = Le(f,g)
 
-# ==(f::Function, x::Real) = Pred(f, == , x)
-# ## ==(f::Function, g::Function) this crosses up Gadfly and others so...
-# eq(f::Function, g::Function) = Pred((x,y) -> f(x,y) - g(x,y), == , 0)
-# ## unicode variants
-# ⩵(f::Function, x::Real) =  f == x
-# ⩵(f::Function, g::Function) = eq(f,g)
+"""
+    `Eq(f, x)` or `f ⩵ x`
+    
+Create predicate for plotting. 
+
+The operators are `Lt` (≪, \ll[tab]), `Le` (≦ \leqq[tab]), `Ge` (≧ \geqq[tab]), `Gt` (≫ \gg[tab]), 
+`Eq` (⩵ \Equal[tab]), or `Neq` (≷ \gtrless[tab] or ≶ \lessgtr[tab]).
+"""
+Eq(f::Function, x::Real) = Pred(f, ==, x)
+⩵(f::Function, x::Real) = Eq(f, x)
+Eq(f::Function, g::Function) = Eq((x,y) -> f(x,y) - g(x,y), 0)
+⩵(f::Function, g::Function) = Eq(f,g)
+
+"""
+    `Ge(f, x)` or `f ≧ x`
+    
+Create predicate for plotting. 
+
+The operators are `Lt` (≪, \ll[tab]), `Le` (≦ \leqq[tab]), `Ge` (≧ \geqq[tab]), `Gt` (≫ \gg[tab]), 
+`Eq` (⩵ \Equal[tab]), or `Neq` (≷ \gtrless[tab] or ≶ \lessgtr[tab]).
+"""
+Ge(f::Function, x::Real) = Le((x,y) -> -f(x,y), -x)
+≧(f::Function, x::Real) = Ge(f, x)
+Ge(f::Function, g::Function) = Ge((x,y) -> f(x,y) - g(x,y), 0)
+≧(f::Function, g::Function) = Ge(f,g)
+
+
+"""
+    `Gt(f, x)` or `f ≫ x`
+    
+Create predicate for plotting. 
+
+The operators are `Lt` (≪, \ll[tab]), `Le` (≦ \leqq[tab]), `Ge` (≧ \geqq[tab]), `Gt` (≫ \gg[tab]), 
+`Eq` (⩵ \Equal[tab]), or `Neq` (≷ \gtrless[tab] or ≶ \lessgtr[tab]).
+"""
+Gt(f::Function, x::Real) = Lt((x,y) -> -f(x,y), -x)
+≫(f::Function, x::Real) = Gt(f, x)
+Gt(f::Function, g::Function) = Gt((x,y) -> f(x,y) - g(x,y), 0)
+≫(f::Function, g::Function) = Gt(f,g)
+
+
+
 
 
 Neq(f::Function, x::Real) = Pred(f, != , x)
@@ -96,15 +112,15 @@ Neq(f::Function, g::Function) = Neq((x,y) -> f(x,y) - g(x,y), 0)
 
 
 
+## Type piracy; remove
+# >=(f::Function, x::Real) = Pred(f, >= , x)
+# >=(f::Function, g::Function) = Pred((x,y) -> f(x,y) - g(x,y), >= , 0)
 
->=(f::Function, x::Real) = Pred(f, >= , x)
->=(f::Function, g::Function) = Pred((x,y) -> f(x,y) - g(x,y), >= , 0)
+# >(f::Function, x::Real) = Pred(f, > , x)
+# >(f::Function, g::Function) = Pred((x,y) -> f(x,y) - g(x,y), > , 0)
 
->(f::Function, x::Real) = Pred(f, > , x)
->(f::Function, g::Function) = Pred((x,y) -> f(x,y) - g(x,y), > , 0)
-
-Base.isless(x::Real, f::Function) = (f >= x)
-Base.isless(f::Function, x::Real) = (f < x)
+# Base.isless(x::Real, f::Function) = (f >= x)
+# Base.isless(f::Function, x::Real) = (f < x)
 
 
 """
@@ -114,18 +130,18 @@ predicates can be negated with `!`. The parsing rules require the
 individual predicates to be enclosed with parentheses, as in `(f==0) | (g==0)`.
 
 """
-type Preds <: Predicate
-    ps
-    ops
+struct Preds{T} <: Predicate{T}
+    ps::Vector
+    ops::Vector
 end
 
 ## Some algebra for Pred and Preds
-(&)(r1::Pred, r2::Pred) = Preds([r1,r2], Any[&])
-(|)(r1::Pred, r2::Pred) = Preds([r1,r2], Any[|])
+(&)(r1::Pred{T}, r2::Pred{T}) where {T} = Preds{T}([r1,r2], Any[&])
+(|)(r1::Pred{T}, r2::Pred{T}) where {T} = Preds{T}([r1,r2], Any[|])
 
-(&)(ps::Preds, r1::Pred) = Preds([ps.ps, r1], [ps.ops, &])
+(&)(ps::Preds{T}, r1::Pred{T}) where {T} = Preds{T}([ps.ps, r1], [ps.ops, &])
 (&)(r1::Pred, ps::Preds) = ps & r1
-(|)(ps::Preds, r1::Pred) = Preds(vcat(ps.ps, r1), vcat(ps.ops, |))
+(|)(ps::Preds{T}, r1::Pred{T}) where {T} = Preds{T}(vcat(ps.ps, r1), vcat(ps.ops, |))
 (|)(r1::Pred, ps::Preds) = ps | r1
 
 

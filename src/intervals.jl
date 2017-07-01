@@ -1,4 +1,3 @@
-
 import Base: <, <=, ==, !==, >=, >,
              &, |, !, ==,
              +, -, *, /, ^
@@ -6,7 +5,7 @@ import Base: <, <=, ==, !==, >=, >,
 ## a few definitionsn for ValidatedNumerics that don't fit in there:
 ## Validated numerics doesn't define these, as the order ins't a total order 
 Base.isless{T<:Real, S<:Real}(i::Interval{T}, j::Interval{S}) = isless(i.hi, j.lo)
-<={T<:Real, S<:Real}(i::Interval{T}, j::Interval{S}) = <=(i.hi, j.lo)
+#<={T<:Real, S<:Real}(i::Interval{T}, j::Interval{S}) = <=(i.hi, j.lo)
 
 #Base.max(i::Interval, j::Interval) = Interval(max(i.lo,j.lo), max(i.hi,j.hi))
 #Base.min(i::Interval, j::Interval) = Interval(min(i.lo,j.lo), min(i.hi,j.hi))
@@ -14,7 +13,7 @@ Base.isless{T<:Real, S<:Real}(i::Interval{T}, j::Interval{S}) = isless(i.hi, j.l
 
 
 ## BInterval represents TRUE (true, true), FALSE (false, false) and MAYBE (false, true)
-immutable BInterval <: Integer
+struct BInterval <: Integer
     lo :: Bool
     hi :: Bool
 
@@ -42,46 +41,46 @@ Base.promote_rule(::Type{BInterval}, ::Type{Bool}) = BInterval
 function negate_op(op)
     (op === <)   && return(>=)
     (op === <=)  && return(>)
-    (op === ==)  && return(!==)
-    (op === !==) && return(==)
+    (op === ==)  && return(!=)
+    (op === !=) && return(==)
     (op === >=)  && return(<)
     (op === >)   && return(<=)
     (op === in)  && return((x,y) -> !in(x,y))
 end
 
 ## OIinterval includes interval, if defined on interval and if continuous on interval
-immutable OInterval <: Real
-    val::Interval
+struct OInterval{T} <: Real
+    val::Interval{T}
     def::BInterval
     cont::BInterval
-    OInterval(val, def, cont) = new(val, def, cont)
 end
 
-@compat Base.show(io::IO,  o::OInterval)  = print(io, "OInterval: ", o.val, " def=", o.def, " cont=",o.cont)
+Base.show(io::IO,  o::OInterval)  = print(io, "OInterval: ", o.val, " def=", o.def, " cont=",o.cont)
 
 ## some outer constructors...
-OInterval{T <: Real, S <: Real}(a::T, b::S) = OInterval(Interval(a,b), TRUE, TRUE)
+OInterval(a::Real, b::Real) = OInterval(Interval(promote(a,b)...), TRUE, TRUE)
 OInterval(a::OInterval, b::OInterval) = a === a ? a : error("a is not b?") ## why is this one necessary?
 OInterval(a) = OInterval(a,a)   # thin one...
 OInterval(i::Interval) = OInterval(i.lo, i.hi)
 
-Base.convert(::Type{OInterval}, i::Interval) = OInterval(i.lo, i.hi)
-Base.convert{S<:Real}(::Type{OInterval}, x::S) = OInterval(x)
-Base.promote_rule{N,B<:Real}(::Type{OInterval}, ::Type{ForwardDiff.Dual{N,B}}) = warn("defined to remove ambiguity")
-Base.promote_rule{A<:Real}(::Type{OInterval}, ::Type{A}) = OInterval
+Base.convert(::Type{OInterval{T}}, i::Interval) where {T} = OInterval(i.lo, i.hi)
+Base.convert(::Type{OInterval{T}}, x::S) where {T, S<:Real} = OInterval(x)
+#Base.promote_rule{N,B<:Real}(::Type{OInterval}, ::Type{ForwardDiff.Dual{N,B}}) = warn("defined to remove ambiguity")
+Base.promote_rule(::Type{S}, ::Type{OInterval{T}}) where {T, S<:Real} = OInterval{promote_type(T,S)}
+Base.promote_rule(::Type{OInterval{T}}, ::Type{S}) where {T, S<:Real} = OInterval{promote_type(T,S)}
 
 ## A region is two OIntervals.
-immutable Region
-    x::OInterval
-    y::OInterval
+struct Region{T}
+    x::OInterval{T}
+    y::OInterval{T}
 end
-
+Region(v::Vector) = Region(OInterval(v[1],v[2]), OInterval(v[3], v[4]))
 ## not good for v0.5+
 #call(f::Function, u::Region) = f(u.x, u.y)
 
 
-#ValidatedNumerics.diam(x::OInterval) = diam(x.val)
 diam(x::OInterval) = diam(x.val)
+
 
 ## extend functions for OInterval
 ## Notice these return BIntervals -- not Bools
@@ -254,7 +253,7 @@ function ^(x::OInterval, q::Rational)
     OInterval(val, x.def, x.cont)
 end
 
-^(x::OInterval, r::ForwardDiff.Dual) = warn("defined to resolve ambiguity")
+#^(x::OInterval, r::ForwardDiff.Dual) = warn("defined to resolve ambiguity")
 function ^(x::OInterval, r::Real)
     r < 0 && return(1/x^(-r))
     if x.val.hi < 0
@@ -297,7 +296,8 @@ end
 ## pixels are [0, W) x [0, H) where (0,0) lower left, (W-1, H-1) upper right
 ## we assume reg is of the form [a,b) x [c,d)
 ## TODO: Should this depend on the operation? f(I) < a should use wider I, f(I) > a should use narrower?
-function xy_region(u, L, R, B, T, W, H)
+function xy_region(u, w, h, W, H)
+    L, R, B, T = w.lo, w.hi, h.lo, h.hi
     px, py = u.x.val,  u.y.val
     a = L + px.lo * (R - L) / W
     b = L + (px.hi) * (R - L) / W
@@ -309,8 +309,8 @@ function xy_region(u, L, R, B, T, W, H)
     x, y
 end
 
-function compute_fxy(p::Pred, u::Region, L, R, B, T, W, H)
-    x, y = xy_region(u, L, R, B, T, W, H)
+function compute_fxy(p::Pred, u::Region, w, h, W, H)
+    x, y = xy_region(u, w, h, W, H)
     p.f(x, y)
 end
 
@@ -319,8 +319,8 @@ end
 Compute whether predicate holds in a given region. Returns FALSE, TRUE or MAYBE
 
 """
-function compute(p::Pred, u::Region, L, R, B, T, W, H)
-    fxy = compute_fxy(p, u, L, R, B, T, W, H)
+function compute(p::Pred, u::Region, w, h, W, H)
+    fxy = compute_fxy(p, u, w, h, W, H)
 
     (fxy.def == FALSE) && return (FALSE)
     isempty(fxy.val) && return (FALSE & fxy.def)
@@ -338,8 +338,8 @@ function compute(p::Pred, u::Region, L, R, B, T, W, H)
 end
 
 ## build up answer
-function compute(ps::Preds, u::Region, L, R, B, T, W, H)
-    vals = [compute(p, u, L, R, B, T, W, H) for p in ps.ps]
+function compute(ps::Preds, u::Region, w, h, W, H)
+    vals = [compute(p, u, w, h, W, H) for p in ps.ps]
     val = shift!(vals)
     for i in 1:length(ps.ops)
         val = ps.ops[i](val, vals[i])
@@ -355,8 +355,8 @@ We return `TRUE` or `MAYBE`. However, that
 leaves some functions showing too much red in the case where there is no zero.
 
 """
-function cross_zero(r::Pred, u::Region, L, R, B, T, W, H)
-    x, y = xy_region(u, L, R, B, T, W, H)
+function cross_zero(r::Pred, u::Region, w, h, W, H)
+    x, y = xy_region(u, w, h, W, H)
     dx, dy = diam(x), diam(y)
     
     n = 20                      # number of random points chosen
@@ -379,8 +379,8 @@ end
 Does this function have a value in the pixel satisfying the inequality? Return `TRUE` or `MAYBE`.
 
 """
-function check_inequality(r::Pred, u::Region, L, R, B, T, W, H)
-    x, y = xy_region(u, L, R, B, T, W, H)
+function check_inequality(r::Pred, u::Region, w, h, W, H)
+    x, y = xy_region(u, w, h, W, H)
     dx, dy = diam(x), diam(y)
     # check 10 random points, here fxy.def == TRUE so we can evaluate function
     n = 10

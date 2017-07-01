@@ -53,31 +53,41 @@ At that point, check each pixel-by-pixel region for possible values.
 
 Return red, black and white vectors of Regions.
 """
-function GRAPH(r, L, R, B, T, W, H)
-    rects = break_into_squares(W, H)
-    
-    k = min(floor(Integer,log2(W)), floor(Integer,log2(H))) # largest square is size 2^k x 2^k
+function GRAPH(pred, L, R, B, T, W::Int, H::Int)
+    l,r,b,t = promote(float(L), R, B, T)
+    n = ceil(Int, log2(W))
+    m = ceil(Int, log2(H))
+    GRAPH(pred, l..r, b..t, n, m)
 
-    reds = [Region(OInterval(u[1], u[2]), OInterval(u[3], u[4])) for u in rects]
-    sizehint!(reds, W)
-    
-    red = Region[]         # 1-pixel red, can't decide via check_continuity
-    black = Region[]
-    white = Region[]
+end
 
+## w Interval for width
+## h Interval for height
+## W = 2^n; H=2^m
+function GRAPH(r, w::Interval{T}, h::Interval{T}, n::Int=8, m::Int=n)  where {T}  
+    rects = break_into_squares(2^n, 2^m)
+    reds = Region.(rects)
+
+    sizehint!(reds, 2^n)
+    
+    red = Region{T}[]         # 1-pixel red, can't decide via check_continuity
+    black = Region{T}[]
+    white = Region{T}[]
+
+    k = max(n, m)  # largest square is size 2^k x 2^k
     while (k >= 0) & (length(reds) > 0)
-        reds = RefinePixels(r, reds, L, R, B, T, W, H, black, white, red)
+        reds = RefinePixels(r, reds, w, h, 2^n, 2^m, black, white, red)
         k = k - 1
     end
     red, black, white 
 end
 
 ## Refine the region
-function RefinePixels(r, U_k, L, R, B, T, W, H, black, white, red)
+function RefinePixels(r, U_k::Vector{Region{T}}, w, h, W, H, black, white, red) where {T}
     ## Uk_1 a refinement of U_k which hold red regions
-    Uk_1 = Region[]
+    Uk_1 = Region{T}[]
     for u in U_k
-        out = compute(r, u,  L, R, B, T, W, H)
+        out = compute(r, u,  w, h, W, H)
         if out == TRUE
             push!(black, u)
         elseif out == FALSE
@@ -95,7 +105,7 @@ function RefinePixels(r, U_k, L, R, B, T, W, H, black, white, red)
                 end
             else
                 ## these are red with diameter 1, could be white or black
-                val = check_continuity(r, u, L, R, B, T, W, H)
+                val = check_continuity(r, u, w, h, W, H)
                 if val == TRUE
                     push!(black, u)
                 elseif val == FALSE
@@ -111,9 +121,9 @@ end
 
 ## for 1-pixel squares, check NaN and continuity
 ## Return TRUE (Black), FALSE (white) or MAYBE (red)
-function check_continuity(r::Pred, u, L, R, B, T, W, H)
+function check_continuity(r::Pred, u, w, h, W, H)
     
-    fxy = compute_fxy(r, u,  L, R, B, T, W, H)
+    fxy = compute_fxy(r, u,  w, h, W, H)
 
     ## check for NaN
     if isempty(fxy.val)
@@ -127,7 +137,7 @@ function check_continuity(r::Pred, u, L, R, B, T, W, H)
     val = FALSE
     if (fxy.cont == TRUE) && ((r.op === ==) || (r.op === <=) || (r.op === >=))
         ## use intermediate value theorem here
-        val = val | cross_zero(r, u, L, R, B, T, W, H)
+        val = val | cross_zero(r, u, w, h, W, H)
         
     end
 
@@ -135,7 +145,7 @@ function check_continuity(r::Pred, u, L, R, B, T, W, H)
     ineqs = [<, <= , ≤, ≶, ≷, ≥, >=, >]
     if (fxy.def == TRUE) && any([r.op === op for op in ineqs])
         ## just check points
-        val = val | check_inequality(r, u, L, R, B, T, W, H)
+        val = val | check_inequality(r, u,w, h, W, H)
     end
 
     ## What to do if fxy.cont !== TRUE...
@@ -148,8 +158,8 @@ function check_continuity(r::Pred, u, L, R, B, T, W, H)
 end
 
 ## Return TRUE, FALSE or MAYBE for predicates
-function check_continuity(rs::Preds, u, L, R, B, T, W, H)
-    vals = map(r -> check_continuity(r, u, L, R, B, T, W, H), rs.ps)
+function check_continuity(rs::Preds, u, w, h, W, H)
+    vals = map(r -> check_continuity(r, u, w, h, W, H), rs.ps)
     val = shift!(vals)
     for i in 1:length(rs.ops)
         val = rs.ops[i](val, vals[i])

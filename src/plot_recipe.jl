@@ -86,7 +86,7 @@ end
 ## red and black are used for colors.
 @recipe function f(p::Predicate; #, x=(-5,5), y=(-5,5);
                    N=8,
-                   M=8,              # oddly m as keyword fails. 9/8 too slow
+                   M=N,              # oddly m as keyword fails. 9/8 too slow
                    red=nothing,      # or :red ...
                    black=:black
                    )
