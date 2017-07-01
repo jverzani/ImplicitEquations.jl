@@ -66,7 +66,7 @@ end
 ## W = 2^n; H=2^m
 function GRAPH(r, w::Interval{T}, h::Interval{T}, n::Int=8, m::Int=n)  where {T}  
     rects = break_into_squares(2^n, 2^m)
-    reds = Region.(rects)
+    reds::Vector{Region{T}} = Region.(rects)
 
     sizehint!(reds, 2^n)
     
@@ -77,7 +77,7 @@ function GRAPH(r, w::Interval{T}, h::Interval{T}, n::Int=8, m::Int=n)  where {T}
     k = max(n, m)  # largest square is size 2^k x 2^k
     while (k >= 0) & (length(reds) > 0)
         reds = RefinePixels(r, reds, w, h, 2^n, 2^m, black, white, red)
-        k = k - 1
+        k -= 1
     end
     red, black, white 
 end
