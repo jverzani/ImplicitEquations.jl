@@ -140,8 +140,8 @@ end
 #    L, R = extrema(x)
 #    B, T = extrema(y)
 
-    xlims = get(d,:xlims, (-5,5))
-    ylims = get(d, :ylims, (-5,5))
+    xlims = get(plotattributes,:xlims, (-5,5))
+    ylims = get(plotattributes, :ylims, (-5,5))
 
     L, R = extrema(xlims)
     B, T = extrema(ylims)
