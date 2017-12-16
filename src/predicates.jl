@@ -4,7 +4,7 @@
 
 import Base: <, <=, ==, !=, !==, >=, >, &, |, !
 
-abstract Predicate
+abstract type Predicate end
 
 """
 
@@ -81,7 +81,7 @@ end
 # ⩵(f::Function, g::Function) = eq(f,g)
 
 
-Neq(f::Function, x::Real) = Pred(f, != , x)
+Neq(f::Function, x::Real) = Pred(f, !== , x)
 Neq(f::Function, g::Function) = Neq((x,y) -> f(x,y) - g(x,y), 0)
 
 ≶(x::Real, y::Real) = (x != y)

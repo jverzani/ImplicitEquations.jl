@@ -5,8 +5,8 @@ import Base: <, <=, ==, !==, >=, >,
 
 ## a few definitionsn for ValidatedNumerics that don't fit in there:
 ## Validated numerics doesn't define these, as the order ins't a total order 
-Base.isless{T<:Real, S<:Real}(i::Interval{T}, j::Interval{S}) = isless(i.hi, j.lo)
-<={T<:Real, S<:Real}(i::Interval{T}, j::Interval{S}) = <=(i.hi, j.lo)
+Base.isless(i::Interval{T}, j::Interval{S}) where {T<:Real, S<:Real} = isless(i.hi, j.lo)
+#<=(i::Interval{T}, j::Interval{S}) where {T<:Real, S<:Real} = <=(i.hi, j.lo)
 
 #Base.max(i::Interval, j::Interval) = Interval(max(i.lo,j.lo), max(i.hi,j.hi))
 #Base.min(i::Interval, j::Interval) = Interval(min(i.lo,j.lo), min(i.hi,j.hi))
@@ -57,18 +57,18 @@ immutable OInterval <: Real
     OInterval(val, def, cont) = new(val, def, cont)
 end
 
-@compat Base.show(io::IO,  o::OInterval)  = print(io, "OInterval: ", o.val, " def=", o.def, " cont=",o.cont)
+Base.show(io::IO,  o::OInterval)  = print(io, "OInterval: ", o.val, " def=", o.def, " cont=",o.cont)
 
 ## some outer constructors...
-OInterval{T <: Real, S <: Real}(a::T, b::S) = OInterval(Interval(a,b), TRUE, TRUE)
+OInterval(a::T, b::S) where {T <: Real, S <: Real}= OInterval(Interval(a,b), TRUE, TRUE)
 OInterval(a::OInterval, b::OInterval) = a === a ? a : error("a is not b?") ## why is this one necessary?
 OInterval(a) = OInterval(a,a)   # thin one...
 OInterval(i::Interval) = OInterval(i.lo, i.hi)
 
 Base.convert(::Type{OInterval}, i::Interval) = OInterval(i.lo, i.hi)
-Base.convert{S<:Real}(::Type{OInterval}, x::S) = OInterval(x)
-Base.promote_rule{N,B<:Real}(::Type{OInterval}, ::Type{ForwardDiff.Dual{N,B}}) = warn("defined to remove ambiguity")
-Base.promote_rule{A<:Real}(::Type{OInterval}, ::Type{A}) = OInterval
+Base.convert(::Type{OInterval}, x::S) where {S<:Real}= OInterval(x)
+Base.promote_rule(::Type{OInterval}, ::Type{ForwardDiff.Dual{N,B}}) where {N,B<:Real} = warn("defined to remove ambiguity")
+Base.promote_rule(::Type{OInterval}, ::Type{A}) where {A<:Real} = OInterval
 
 ## A region is two OIntervals.
 immutable Region

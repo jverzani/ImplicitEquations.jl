@@ -1,4 +1,4 @@
-[![ImplicitEquations](http://pkg.julialang.org/badges/ImplicitEquations_0.4.svg)](http://pkg.julialang.org/?pkg=ImplicitEquations&ver=0.4)
+[![ImplicitEquations](http://pkg.julialang.org/badges/ImplicitEquations_0.6.svg)](http://pkg.julialang.org/?pkg=ImplicitEquations&ver=0.6)
 &nbsp;
 Linux: [![Build Status](https://travis-ci.org/jverzani/ImplicitEquations.jl.svg?branch=master)](https://travis-ci.org/jverzani/ImplicitEquations.jl)
 &nbsp;
