@@ -2,31 +2,26 @@
 
 #f(x,y) < 0 or f(x,y) == 0
 
-import Base: <, <=, ==, !=, !==, >=, >, &, |, !
+#import Base: <, <=, ==, !=, !==, >=, >
+import Base: &, |, !
 
 abstract type Predicate end
 
 """
 
 A predicate is defined in terms of a function of two variables, an
-inquality, and either another function or a real number. 
-They are conveniently created by the functions `Lt`, `Le`, `Eq`, `Neq`, `Ge`, and `Gt`. The unicode operators
-`≪` (`\ll[tab]`), `≦` (`\leqq[tab]`), `⩵` (`\Equal[tab]`), `≶` (`\lessgtr[tab]`)  or `≷` (`\gtrless[tab]`), `≧` (`\geqq[tab]`), `≫` (`\leqq[tab]`) may also be used.
+inquality, and either another function or a real number.  They are
+conveniently created by the functions `Lt`, `Le`, `Eq`, `Neq`, `Ge`,
+and `Gt`. The equivalent unicode operators:
 
+* `≪` (`\ll[tab]`), 
+* `≦` (`\leqq[tab]`),
+* `⩵` (`\Equal[tab]`), 
+* `≶` (`\lessgtr[tab]`)  or `≷` (`\gtrless[tab]`), 
+* `≧` (`\geqq[tab]`), 
+* `≫` (`\leqq[tab]`) may also be used.
 
- For example,
-`f < 0` or `f >= g`. The case `f==g` and `f != g` are not defined, as doing so crosses
-up `Gadfly` and other code that compares functions for equality. Use
-`eq(f,g)`  or `f \Equal<tab> g` for equality and `neq(f,g)` or `f \gtrless<tab> g` for not equal.
-
-Available operations to produce predicates:
-
-* `<`
-* `<=`, `≤` (`\le<tab>`)
-* `==` (`Function == Real`), `eq(f,g)`, `⩵` (`\Equal<tab>`)
-* `!==` (`Function != Real`), `neq(f,g)`, `≷` (`\gtrless<tab>`), `≶` (`\lessgtr<tab>`)
-* `>=`, `≥` (`\ge<tab>`)
-* `>`
+The use of Julia's usual comparison operators is no longer supported.
 
 To combine predicates, `&` and `|` can be used.
 
@@ -97,14 +92,14 @@ Neq(f::Function, g::Function) = Neq((x,y) -> f(x,y) - g(x,y), 0)
 
 
 
->=(f::Function, x::Real) = Pred(f, >= , x)
->=(f::Function, g::Function) = Pred((x,y) -> f(x,y) - g(x,y), >= , 0)
+#>=(f::Function, x::Real) = Pred(f, >= , x)
+#>=(f::Function, g::Function) = Pred((x,y) -> f(x,y) - g(x,y), >= , 0)
 
->(f::Function, x::Real) = Pred(f, > , x)
->(f::Function, g::Function) = Pred((x,y) -> f(x,y) - g(x,y), > , 0)
+#>(f::Function, x::Real) = Pred(f, > , x)
+#>(f::Function, g::Function) = Pred((x,y) -> f(x,y) - g(x,y), > , 0)
 
-Base.isless(x::Real, f::Function) = (f >= x)
-Base.isless(f::Function, x::Real) = (f < x)
+#Base.isless(x::Real, f::Function) = Ge(F, x) #(f >= x)
+#Base.isless(f::Function, x::Real) = Lt(f, x) #(f < x)
 
 
 """
