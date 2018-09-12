@@ -58,7 +58,7 @@ function xyrange(u, L, R, B, T, W, H; offset=0)
 end
 
 
-function get_xs_ys(rs, L, R, B, T, W, H)
+function get_xs_ys(map::Void, rs, L, R, B, T, W, H)
     xs = Float64[]
     ys = Float64[]
     for u in rs
@@ -77,18 +77,64 @@ function get_xs_ys(rs, L, R, B, T, W, H)
     xs, ys
 end
 
+function imag_map(f, a,b,w,h, n=100)
+    xs = zeros(4n)
+    ys = zeros(4n)
+    for i in 1:n
+        xs[i] = a + i/n * w
+        ys[i] = b
+    end
+    for i in 1:n
+        xs[n+i] = a + w
+        ys[n+i] = b + i/n*h
+    end
+    for i in 1:n
+        xs[2n+i] = a + w - i/n*w
+        ys[2n+i] = b+h
+    end
+    for i in 1:n
+        xs[3n+i] = a
+        ys[3n+i] = b + h - i/n*h
+    end
+
+    zs = complex.(xs, ys)
+    (real.(f.(zs)), imag.(f.(zs)))
+end
+
+
+
+function get_xs_ys(map::Function, rs, L, R, B, T, W, H)
+    xs = Float64[]
+    ys = Float64[]
+    for u in rs
+        x0,x1,y0,y1 = ImplicitEquations.xyrange(u, L,R,B,T,W,H)
+        nxs, nys = imag_map(map, x0, y0, x1-x0, y1-y0)
+        append!(xs, nxs); push!(xs, NaN)
+        append!(ys, nys); push!(ys, NaN)
+    end
+    if length(xs) > 0
+        pop!(xs)
+        pop!(ys)
+    else
+        xs = Float64[NaN]
+        ys = Float64[NaN]
+    end
+
+    xs, ys
+end
+
 
 
 
 ## A plot recipe
-## x, y describe region to plot over
 ## N, M give no. of pixels 2^N by 2^M
 ## red and black are used for colors.
 @recipe function f(p::Predicate; #, x=(-5,5), y=(-5,5);
                    N=8,
                    M=8,              # oddly m as keyword fails. 9/8 too slow
                    red=nothing,      # or :red ...
-                   black=:black
+                   black=:black,
+                   map=nothing       # union(Void, Function...)
                    )
 
 #    L, R = extrema(x)
@@ -108,7 +154,9 @@ end
     ## add red as a series
     if length(r) > 0 && red != nothing
         @series begin
+
             xs, ys = get_xs_ys(r, L, R, B, T, W, H)
+
 
             seriestype := :shape
             fillcolor := red
@@ -129,7 +177,7 @@ end
     fillcolor --> black
     linewidth --> 0
 
-    xs, ys = get_xs_ys(b, L, R, B, T, W, H)
+    xs, ys = get_xs_ys(map, b, L, R, B, T, W, H)
     x --> xs
     y --> ys
 

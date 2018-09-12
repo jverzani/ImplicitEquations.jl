@@ -153,6 +153,25 @@ The above example illustrates a few things:
   by slow, it can mean really slow. The difference between rendering
   `(1-x^2)*(2-y^2)` and `csc(1-x^2)*cot(2-y^2)` can be 10 times.)
 
+## Maps
+
+If a function $f:C \rightarrow C$ is passed through the `map` argument
+of `plot`, each rectangle to render is mapped by the function $f$
+prior to drawing. This allows for viewing of conformal maps. This
+example is one of
+[several](http://mathfaculty.fullerton.edu/mathews/c2003/ConformalMapDictionary.1.html):
+
+```
+f(x,y) = x
+plot(f ≧ 1/2, map=z -> 1/z)
+```
+
+The region that is mapped above is not the half plane $x >= 1/2$, but
+truncated by $|y| < 5$ due to the default values of `ylims`. Hence we
+don't see the full circle.
+
+As well, the pieces plotted are polygonal approximations to the
+correct image. Consequently, gaps can appear.
 
 ## A "typical" application
 
