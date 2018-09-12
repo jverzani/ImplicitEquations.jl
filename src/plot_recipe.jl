@@ -58,7 +58,7 @@ function xyrange(u, L, R, B, T, W, H; offset=0)
 end
 
 
-function get_xs_ys(map::Void, rs, L, R, B, T, W, H)
+function get_xs_ys(map::Nothin, rs, L, R, B, T, W, H)
     xs = Float64[]
     ys = Float64[]
     for u in rs
@@ -134,7 +134,7 @@ end
                    M=8,              # oddly m as keyword fails. 9/8 too slow
                    red=nothing,      # or :red ...
                    black=:black,
-                   map=nothing       # union(Void, Function...)
+                   map=nothing       # union(Nothing, Function...)
                    )
 
 #    L, R = extrema(x)
