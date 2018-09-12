@@ -38,7 +38,7 @@ plot(f == 0)
 c,d,e,h = 1,1,1,1
 f(x,y) = x*y
 g(x,y) =c*x^3 + d*x^2 + e*x + h
-plot(eq(f,g), title="Trident of Newton") ## aka f ⩵ g (using Unicode\Equal[tab])
+plot(eq(f,g), title="Trident of Newton") ## aka f ⩵ g (using Unicode\\Equal[tab])
 
 ## inequality
 f(x,y)= (y-5)*cos(4*sqrt((x-4)^2 + y^2))
@@ -49,7 +49,7 @@ plot(r, (-10, 10), (-10, 10), N=9, M=9)  # (xmin, xmax), (ymin, ymax),
 """
 plot_implicit = nothing
 
-## Helpers to convert 
+## Helpers to convert
 linterp(A,B,a,b,W) = (a + A/W*(b-a),a + B/W*(b-a))
 
 function xyrange(u, L, R, B, T, W, H; offset=0)
@@ -90,12 +90,12 @@ end
                    red=nothing,      # or :red ...
                    black=:black
                    )
-    
+
 #    L, R = extrema(x)
 #    B, T = extrema(y)
 
-    xlims = get(d,:xlims, (-5,5))
-    ylims = get(d, :ylims, (-5,5))
+    xlims = get(plotattributes,:xlims, (-5,5))
+    ylims = get(plotattributes, :ylims, (-5,5))
 
     L, R = extrema(xlims)
     B, T = extrema(ylims)
@@ -109,13 +109,13 @@ end
     if length(r) > 0 && red != nothing
         @series begin
             xs, ys = get_xs_ys(r, L, R, B, T, W, H)
-            
+
             seriestype := :shape
             fillcolor := red
             linewidth := 0
             x := xs
             y := ys
-            
+
             ()
         end
     end
@@ -132,9 +132,7 @@ end
     xs, ys = get_xs_ys(b, L, R, B, T, W, H)
     x --> xs
     y --> ys
-    
+
     ()
-    
+
 end
-
-

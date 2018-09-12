@@ -1,5 +1,5 @@
 using ImplicitEquations
-using Base.Test
+using Test
 
 
 f(x,y) = y-x

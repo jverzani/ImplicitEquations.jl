@@ -22,7 +22,6 @@ is graphed over the default region as follows:
 
 ```
 using Plots, ImplicitEquations
-pyplot()
 
 a,b = -1,2
 f(x,y) = y^4 - x^4 + a*y^2 + b*x^2
@@ -121,11 +120,11 @@ Uses a few new things: the `screen` function is used to restrict
 ranges and logical operators to combine predicates.
 
 ```
-f0(x,y) = ((x/7)^2 + (y/3)^2 - 1)  *   screen(abs(x)>3) * screen(y > -3*sqrt(33)/7) 
+f0(x,y) = ((x/7)^2 + (y/3)^2 - 1)  *   screen(abs(x)>3) * screen(y > -3*sqrt(33)/7)
 f1(x,y) = ( abs(x/2)-(3 * sqrt(33)-7) * x^2/112 -3 +sqrt(1-(abs((abs(x)-2))-1)^2)-y)
 f2(x,y) = y - (9 - 8*abs(x))       *   screen((abs(x)>= 3/4) &  (abs(x) <= 1) )
 f3(x,y) = y - (3*abs(x) + 3/4)     *   I_((1/2 < abs(x)) & (abs(x) < 3/4))    # alternate name for screen
-f4(x,y) = y - 2.25                 *   I_(abs(x) <= 1/2) 
+f4(x,y) = y - 2.25                 *   I_(abs(x) <= 1/2)
 f5(x,y) = (6 * sqrt(10)/7 + (1.5-.5 * abs(x)) - 6 * sqrt(10)/14 * sqrt(4-(abs(x)-1)^2) -y) * screen(abs(x) >= 1)
 
 r = (f0 ⩵ 0) | (f1 ⩵ 0) | (f2 ⩵ 0) | (f3 ⩵ 0) | (f4 ⩵ 0) | (f5 ⩵ 0)
@@ -167,7 +166,7 @@ plot(f ⩵ 2*3^2)
 ## now add tangent at (3,3)
 a,b = 3,3
 dydx(a,b) = -b/a             # implicit differentiate to get dy/dx =-y/x
-tl(x) = b + dydx(a,b)*(x-a)  
+tl(x) = b + dydx(a,b)*(x-a)
 plot!(tl, linewidth=3, -5, 5)
 ```
 
@@ -185,7 +184,7 @@ interval arithmetic, as possible.
 
 The package
 [IntervalConstraintProgramming ](https://github.com/dpsanders/IntervalConstraintProgramming.jl)
-also allows for this type of graphing, and momre.
+also allows for this type of graphing, and more.
 
 ## TODO
 
@@ -202,4 +201,3 @@ also allows for this type of graphing, and momre.
 * Tupper sketches out how to be more rigorous with computing whether a region is black or white.
 
 * increase speed (could color 1-pixel regions better if so, perhaps; division checks; type stability).
-
