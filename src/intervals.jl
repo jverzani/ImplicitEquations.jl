@@ -4,7 +4,7 @@ import Base: <, <=, ==, !==, >=, >,
              +, -, *, /, ^
 
 ## a few definitionsn for ValidatedNumerics that don't fit in there:
-## Validated numerics doesn't define these, as the order ins't a total order 
+## Validated numerics doesn't define these, as the order ins't a total order
 Base.isless(i::Interval{T}, j::Interval{S}) where {T<:Real, S<:Real} = isless(i.hi, j.lo)
 #<=(i::Interval{T}, j::Interval{S}) where {T<:Real, S<:Real} = <=(i.hi, j.lo)
 
@@ -14,7 +14,7 @@ Base.isless(i::Interval{T}, j::Interval{S}) where {T<:Real, S<:Real} = isless(i.
 
 
 ## BInterval represents TRUE (true, true), FALSE (false, false) and MAYBE (false, true)
-immutable BInterval <: Integer
+struct BInterval <: Integer
     lo :: Bool
     hi :: Bool
 
@@ -50,13 +50,13 @@ function negate_op(op)
 end
 
 ## OIinterval includes interval, if defined on interval and if continuous on interval
-immutable OInterval <: Real
+struct OInterval <: Real
     val::Interval
     def::BInterval
     cont::BInterval
     OInterval(val, def, cont) = new(val, def, cont)
 end
-
+(O::OInterval)(o::OInterval) = o
 Base.show(io::IO,  o::OInterval)  = print(io, "OInterval: ", o.val, " def=", o.def, " cont=",o.cont)
 
 ## some outer constructors...
@@ -66,22 +66,16 @@ OInterval(a) = OInterval(a,a)   # thin one...
 OInterval(i::Interval) = OInterval(i.lo, i.hi)
 
 Base.convert(::Type{OInterval}, i::Interval) = OInterval(i.lo, i.hi)
-Base.convert(::Type{OInterval}, x::S) where {S<:Real}= OInterval(x)
-Base.promote_rule(::Type{OInterval}, ::Type{ForwardDiff.Dual{N,B}}) where {N,B<:Real} = warn("defined to remove ambiguity")
+
 Base.promote_rule(::Type{OInterval}, ::Type{A}) where {A<:Real} = OInterval
 
 ## A region is two OIntervals.
-immutable Region
+struct Region
     x::OInterval
     y::OInterval
 end
 
-## not good for v0.5+
-#call(f::Function, u::Region) = f(u.x, u.y)
-
-
-#ValidatedNumerics.diam(x::OInterval) = diam(x.val)
-diam(x::OInterval) = diam(x.val)
+ImplicitEquations.diam(x::OInterval) = diam(x.val)
 
 ## extend functions for OInterval
 ## Notice these return BIntervals -- not Bools
@@ -116,7 +110,7 @@ rather a `BInterval` which allows for a "MAYBE" state. As such, a
 simple ternary operator, like `x > 0 ? 1 : NaN` won't work, to screen values.
 
 """
-screen(ex) = (ex == FALSE) ? NaN : 1 
+screen(ex) = (ex == FALSE) ? NaN : 1
 const I_ = screen               # indicator function like!
 
 ## Functions which are continuous everywhere
@@ -159,7 +153,7 @@ Base.tanh(x::OInterval) = sinh(x)/cosh(x)
 Base.coth(x::OInterval) = 1/tanh(x)
 
 function Base.asin(x::OInterval)
-    if x.val.hi < -1.0 ||  x.val.lo > 1.0  
+    if x.val.hi < -1.0 ||  x.val.lo > 1.0
         OInterval(x.val, FALSE, FALSE)
     elseif (x.val.lo < -1.0) & (x.val.hi > 1.0)
         OInterval(Interval(-pi/2, pi/2), x.def & MAYBE, x.cont)
@@ -208,7 +202,7 @@ Base.exp(x::OInterval) = OInterval(exp(x.val), x.def, x.cont)
 ## /
 ## division is slow
 function /(x::OInterval, y::OInterval)
-    ## 0 is the issue. 
+    ## 0 is the issue.
     if 0.0 ∈ y.val
         ## maybe defined, maybe continuous
         OInterval(x.val/y.val, x.def & MAYBE, x.cont & MAYBE)
@@ -218,7 +212,7 @@ function /(x::OInterval, y::OInterval)
 end
 
 ## log
-function Base.log(x::OInterval) 
+function Base.log(x::OInterval)
     if x.val.hi <= 0
         OInterval(x.val, FALSE, FALSE)
     elseif x.val.lo <= 0
@@ -254,7 +248,6 @@ function ^(x::OInterval, q::Rational)
     OInterval(val, x.def, x.cont)
 end
 
-^(x::OInterval, r::ForwardDiff.Dual) = warn("defined to resolve ambiguity")
 function ^(x::OInterval, r::Real)
     r < 0 && return(1/x^(-r))
     if x.val.hi < 0
@@ -287,7 +280,7 @@ end
 
 Base.max(x::OInterval, y::OInterval) = OInterval(max(x.val, y.val), x.def & y.def, x.cont & y.cont)
 Base.min(x::OInterval, y::OInterval) = OInterval(min(x.val, y.val), x.def & y.def, x.cont & y.cont)
-    
+
 
 ## others sign, mod, ...
 function Base.sign(x::OInterval)
@@ -304,7 +297,7 @@ function xy_region(u, L, R, B, T, W, H)
     c = B + py.lo * (T - B) / H
     d = B + (py.hi) * (T - B) / H
     delta = sqrt(eps())
-    
+
     x, y  = OInterval(a+(u.x.cont==TRUE)*delta,b-delta), OInterval(c+0*delta,d-delta)
     x, y
 end
@@ -324,7 +317,7 @@ function compute(p::Pred, u::Region, L, R, B, T, W, H)
 
     (fxy.def == FALSE) && return (FALSE)
     isempty(fxy.val) && return (FALSE & fxy.def)
-    
+
     if p.op === ==
         return((p.val ∈ fxy.val) ? MAYBE : FALSE)
     elseif negate_op(p.op) === ==
@@ -340,7 +333,7 @@ end
 ## build up answer
 function compute(ps::Preds, u::Region, L, R, B, T, W, H)
     vals = [compute(p, u, L, R, B, T, W, H) for p in ps.ps]
-    val = shift!(vals)
+    val = popfirst!(vals)
     for i in 1:length(ps.ops)
         val = ps.ops[i](val, vals[i])
     end
@@ -351,14 +344,14 @@ end
 
 Does this function have a zero crossing? Heuristic check.
 
-We return `TRUE` or `MAYBE`. However, that 
+We return `TRUE` or `MAYBE`. However, that
 leaves some functions showing too much red in the case where there is no zero.
 
 """
 function cross_zero(r::Pred, u::Region, L, R, B, T, W, H)
     x, y = xy_region(u, L, R, B, T, W, H)
     dx, dy = diam(x), diam(y)
-    
+
     n = 20                      # number of random points chosen
     λ1s, λ2s = [0.0; 1.0;rand(n)], [0.0; 1.0; rand(n)]
     β1s, β2s = [1.0; 0.0; rand(n)], [1.0; 0.0; rand(n)]
@@ -370,7 +363,7 @@ function cross_zero(r::Pred, u::Region, L, R, B, T, W, H)
         val = (r.f(ll...) - r.val) * (r.f(ur...) - r.val)
         ((val <= 0)==TRUE) && return(TRUE)
     end
-    return(MAYBE)              
+    return(MAYBE)
 end
 
 

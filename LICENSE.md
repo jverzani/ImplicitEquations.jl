@@ -1,6 +1,6 @@
 The ImplicitEquations.jl package is licensed under the MIT "Expat" License:
 
-> Copyright (c) 2014-16: jverzani.
+> Copyright (c) 2014-18: jverzani.
 >
 > Permission is hereby granted, free of charge, to any person obtaining
 > a copy of this software and associated documentation files (the

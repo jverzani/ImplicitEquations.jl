@@ -14,12 +14,12 @@ inquality, and either another function or a real number.  They are
 conveniently created by the functions `Lt`, `Le`, `Eq`, `Neq`, `Ge`,
 and `Gt`. The equivalent unicode operators:
 
-* `≪` (`\ll[tab]`), 
-* `≦` (`\leqq[tab]`),
-* `⩵` (`\Equal[tab]`), 
-* `≶` (`\lessgtr[tab]`)  or `≷` (`\gtrless[tab]`), 
-* `≧` (`\geqq[tab]`), 
-* `≫` (`\leqq[tab]`) may also be used.
+* `≪` (`\\ll[tab]`),
+* `≦` (`\\leqq[tab]`),
+* `⩵` (`\\Equal[tab]`),
+* `≶` (`\\lessgtr[tab]`)  or `≷` (`\\gtrless[tab]`),
+* `≧` (`\\geqq[tab]`),
+* `≫` (`\\leqq[tab]`) may also be used.
 
 The use of Julia's usual comparison operators is no longer supported.
 
@@ -28,7 +28,7 @@ To combine predicates, `&` and `|` can be used.
 To negate a predicate, `!` is used.
 
 """
-type Pred <: Predicate
+mutable struct Pred <: Predicate
     f::Function
     op
     val
@@ -46,11 +46,6 @@ preds = [(:Lt, :≪, :<), # \ll
 for (fn, uop, op) in preds
     fnname =  string(fn)
     @eval begin
-        @doc """
-    `$($fnname)`: Create predicate for plotting. 
-The operators are `Lt` (≪, \ll[tab]), `Le` (≦ \leqq[tab]), `Ge` (≧ \geqq[tab]), `Gt` (≫ \gg[tab]), 
-`Eq` (⩵ \Equal[tab]), or `Neq` (≷ \gtrless[tab] or ≶ \lessgtr[tab]).
-""" ->
         ($fn)(f::Function, x::Real) = Pred(f, $op, x)
         ($uop)(f::Function, x::Real) = ($fn)(f, x)
         ($fn)(f::Function, g::Function) = $(fn)((x,y) -> f(x,y) - g(x,y), 0)
@@ -59,22 +54,6 @@ The operators are `Lt` (≪, \ll[tab]), `Le` (≦ \leqq[tab]), `Ge` (≧ \geqq[t
     eval(Expr(:export, fn))
     eval(Expr(:export, uop))
 end
-
-# <(f::Function, x::Real) = Pred(f, < , x) 
-# <(f::Function, g::Function) = Pred((x,y) -> f(x,y) - g(x,y), < , 0)
-
-
-
-# <=(f::Function, x::Real) = Pred(f, <= , x)
-# <=(f::Function, g::Function) = Pred((x,y) -> f(x,y) - g(x,y), <= , 0)
-
-# ==(f::Function, x::Real) = Pred(f, == , x)
-# ## ==(f::Function, g::Function) this crosses up Gadfly and others so...
-# eq(f::Function, g::Function) = Pred((x,y) -> f(x,y) - g(x,y), == , 0)
-# ## unicode variants
-# ⩵(f::Function, x::Real) =  f == x
-# ⩵(f::Function, g::Function) = eq(f,g)
-
 
 Neq(f::Function, x::Real) = Pred(f, !== , x)
 Neq(f::Function, g::Function) = Neq((x,y) -> f(x,y) - g(x,y), 0)
@@ -91,17 +70,6 @@ Neq(f::Function, g::Function) = Neq((x,y) -> f(x,y) - g(x,y), 0)
 
 
 
-
-#>=(f::Function, x::Real) = Pred(f, >= , x)
-#>=(f::Function, g::Function) = Pred((x,y) -> f(x,y) - g(x,y), >= , 0)
-
-#>(f::Function, x::Real) = Pred(f, > , x)
-#>(f::Function, g::Function) = Pred((x,y) -> f(x,y) - g(x,y), > , 0)
-
-#Base.isless(x::Real, f::Function) = Ge(F, x) #(f >= x)
-#Base.isless(f::Function, x::Real) = Lt(f, x) #(f < x)
-
-
 """
 
 Predicates can be joined together with either `&` or `|`. Individual
@@ -109,7 +77,7 @@ predicates can be negated with `!`. The parsing rules require the
 individual predicates to be enclosed with parentheses, as in `(f==0) | (g==0)`.
 
 """
-type Preds <: Predicate
+mutable struct Preds <: Predicate
     ps
     ops
 end
@@ -122,5 +90,3 @@ end
 (&)(r1::Pred, ps::Preds) = ps & r1
 (|)(ps::Preds, r1::Pred) = Preds(vcat(ps.ps, r1), vcat(ps.ops, |))
 (|)(r1::Pred, ps::Preds) = ps | r1
-
-

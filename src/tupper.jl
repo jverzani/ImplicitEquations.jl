@@ -55,12 +55,12 @@ Return red, black and white vectors of Regions.
 """
 function GRAPH(r, L, R, B, T, W, H)
     rects = break_into_squares(W, H)
-    
+
     k = min(floor(Integer,log2(W)), floor(Integer,log2(H))) # largest square is size 2^k x 2^k
 
     reds = [Region(OInterval(u[1], u[2]), OInterval(u[3], u[4])) for u in rects]
     sizehint!(reds, W)
-    
+
     red = Region[]         # 1-pixel red, can't decide via check_continuity
     black = Region[]
     white = Region[]
@@ -69,7 +69,7 @@ function GRAPH(r, L, R, B, T, W, H)
         reds = RefinePixels(r, reds, L, R, B, T, W, H, black, white, red)
         k = k - 1
     end
-    red, black, white 
+    red, black, white
 end
 
 ## Refine the region
@@ -89,7 +89,7 @@ function RefinePixels(r, U_k, L, R, B, T, W, H, black, white, red)
             if (dx > 1) & (dy > 1)
                 hx = div(dx,2); hy = div(dy,2)
                 for i in 0:1, j in 0:1
-                    uij = Region(OInterval(x.lo + i*hx, x.lo + (i+1)*hx), 
+                    uij = Region(OInterval(x.lo + i*hx, x.lo + (i+1)*hx),
                                       OInterval(y.lo + j*hy, y.lo + (j+1)*hy))
                     push!(Uk_1, uij)
                 end
@@ -112,7 +112,7 @@ end
 ## for 1-pixel squares, check NaN and continuity
 ## Return TRUE (Black), FALSE (white) or MAYBE (red)
 function check_continuity(r::Pred, u, L, R, B, T, W, H)
-    
+
     fxy = compute_fxy(r, u,  L, R, B, T, W, H)
 
     ## check for NaN
@@ -122,13 +122,13 @@ function check_continuity(r::Pred, u, L, R, B, T, W, H)
     if (fxy.def == FALSE) || (fxy.def == MAYBE)
         return(FALSE)
     end
-    
+
     ## now check continuity,
     val = FALSE
     if (fxy.cont == TRUE) && ((r.op === ==) || (r.op === <=) || (r.op === >=))
         ## use intermediate value theorem here
         val = val | cross_zero(r, u, L, R, B, T, W, H)
-        
+
     end
 
     ## Now check for inequalities
@@ -150,7 +150,7 @@ end
 ## Return TRUE, FALSE or MAYBE for predicates
 function check_continuity(rs::Preds, u, L, R, B, T, W, H)
     vals = map(r -> check_continuity(r, u, L, R, B, T, W, H), rs.ps)
-    val = shift!(vals)
+    val = popfirst!(vals)
     for i in 1:length(rs.ops)
         val = rs.ops[i](val, vals[i])
     end

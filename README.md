@@ -1,5 +1,3 @@
-[![ImplicitEquations](http://pkg.julialang.org/badges/ImplicitEquations_0.6.svg)](http://pkg.julialang.org/?pkg=ImplicitEquations&ver=0.6)
-&nbsp;
 Linux: [![Build Status](https://travis-ci.org/jverzani/ImplicitEquations.jl.svg?branch=master)](https://travis-ci.org/jverzani/ImplicitEquations.jl)
 &nbsp;
 Windows: [![Build Status](https://ci.appveyor.com/api/projects/status/github/jverzani/ImplicitEquations.jl?branch=master&svg=true)](https://ci.appveyor.com/project/jverzani/implicitequations-jl)
@@ -32,5 +30,3 @@ plot(f ⩵ 0)  # \Equal[tab]
 ```
 
 ![DevilsCurve](http://i.imgur.com/LChTzC1.png)
-
-
