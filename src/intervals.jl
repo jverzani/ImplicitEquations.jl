@@ -68,6 +68,7 @@ OInterval(i::Interval) = OInterval(i.lo, i.hi)
 Base.convert(::Type{OInterval}, i::Interval) = OInterval(i.lo, i.hi)
 
 Base.promote_rule(::Type{OInterval}, ::Type{A}) where {A<:Real} = OInterval
+Base.float(i::OInterval) = OInterval(float(i.val), i.def, i.cont)
 
 ## A region is two OIntervals.
 struct Region
