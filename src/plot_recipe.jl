@@ -130,8 +130,8 @@ end
 ## N, M give no. of pixels 2^N by 2^M
 ## red and black are used for colors.
 @recipe function f(p::Predicate; #, x=(-5,5), y=(-5,5);
-                   N=8,
-                   M=8,              # oddly m as keyword fails. 9/8 too slow
+                   N=10,
+                   M=10,              # oddly m as keyword fails. 9/8 too slow
                    red=nothing,      # or :red ...
                    black=:black,
                    map=nothing       # union(Nothing, Function...)
