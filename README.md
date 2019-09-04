@@ -5,7 +5,7 @@ Windows: [![Build Status](https://ci.appveyor.com/api/projects/status/github/jve
 # ImplicitEquations
 
 
-In a paper, [Tupper](http://www.dgp.toronto.edu/people/mooncake/papers/SIGGRAPH2001_Tupper.pdf)
+In a paper, [Tupper](https://doi.org/10.1145/383259.383267)
 presents a method for graphing two-dimensional implicit equations and
 inequalities. This package gives an
 implementation of the paper's basic algorithms to allow

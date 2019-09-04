@@ -3,7 +3,7 @@
 
 
 This paper by
-[Tupper](http://www.dgp.toronto.edu/people/mooncake/papers/SIGGRAPH2001_Tupper.pdf)
+[Tupper](https://doi.org/10.1145/383259.383267)
 details a method for graphing two-dimensional implicit equations and
 inequalities. This package gives an
 implementation of the  paper's basic algorithms to allow
