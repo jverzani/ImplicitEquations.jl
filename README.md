@@ -1,6 +1,5 @@
-Linux: [![Build Status](https://travis-ci.org/jverzani/ImplicitEquations.jl.svg?branch=master)](https://travis-ci.org/jverzani/ImplicitEquations.jl)
-&nbsp;
-Windows: [![Build Status](https://ci.appveyor.com/api/projects/status/github/jverzani/ImplicitEquations.jl?branch=master&svg=true)](https://ci.appveyor.com/project/jverzani/implicitequations-jl)
+[![Build Status](https://travis-ci.com/jverzani/ImplicitEquations.jl.svg?branch=master)](https://travis-ci.com/jverzani/ImplicitEquations.jl)
+
 
 # ImplicitEquations
 
