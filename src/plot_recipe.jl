@@ -133,7 +133,8 @@ end
                    N=10,
                    M=10,              # oddly m as keyword fails. 9/8 too slow
                    red=nothing,      # or :red ...
-                   black=:black,
+                   fillcolor=:black,
+                   black=nothing,
                    map=nothing       # union(Nothing, Function...)
                    )
 
@@ -155,7 +156,7 @@ end
     if length(r) > 0 && red != nothing
         @series begin
 
-            xs, ys = get_xs_ys(r, L, R, B, T, W, H)
+            xs, ys = get_xs_ys(map, r, L, R, B, T, W, H)
 
 
             seriestype := :shape
@@ -174,7 +175,7 @@ end
 #    ylims --> [B, T]
     legend --> false
 
-    fillcolor --> black
+    fillcolor --> black == nothing ? fillcolor : black
     linewidth --> 0
 
     xs, ys = get_xs_ys(map, b, L, R, B, T, W, H)
