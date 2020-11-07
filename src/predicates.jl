@@ -29,7 +29,7 @@ To negate a predicate, `!` is used.
 
 """
 mutable struct Pred <: Predicate
-    f::Function
+    f
     op
     val
 end
@@ -46,25 +46,25 @@ preds = [(:Lt, :≪, :<), # \ll
 for (fn, uop, op) in preds
     fnname =  string(fn)
     @eval begin
-        ($fn)(f::Function, x::Real) = Pred(f, $op, x)
-        ($uop)(f::Function, x::Real) = ($fn)(f, x)
-        ($fn)(f::Function, g::Function) = $(fn)((x,y) -> f(x,y) - g(x,y), 0)
-        ($uop)(f::Function, g::Function) = ($fn)(f, g)
+        ($fn)(f, x::Real) = Pred(f, $op, x)
+        ($uop)(f, x::Real) = ($fn)(f, x)
+        ($fn)(f, g) = $(fn)((x,y) -> f(x,y) - g(x,y), 0)
+        ($uop)(f, g) = ($fn)(f, g)
     end
     eval(Expr(:export, fn))
     eval(Expr(:export, uop))
 end
 
-Neq(f::Function, x::Real) = Pred(f, !== , x)
-Neq(f::Function, g::Function) = Neq((x,y) -> f(x,y) - g(x,y), 0)
+Neq(f, x::Real) = Pred(f, !== , x)
+Neq(f, g) = Neq((x,y) -> f(x,y) - g(x,y), 0)
 
 ≶(x::Real, y::Real) = (x != y)
-≶(f::Function, x::Real) = Neq(f, x)
-≶(f::Function, g::Function) = Neq(f, g)
+≶(f, x::Real) = Neq(f, x)
+≶(f, g) = Neq(f, g)
 
 ≷(x::Real, y::Real) = (x != y)
-≷(f::Function, x::Real) = Neq(f, x)
-≷(f::Function, g::Function) = Neq(f, g)
+≷(f, x::Real) = Neq(f, x)
+≷(f, g) = Neq(f, g)
 
 
 
