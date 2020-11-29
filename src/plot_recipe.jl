@@ -32,7 +32,7 @@ pyplot()
 
 a,b = -1,2
 f(x,y) = y^4 - x^4 + a*y^2 + b*x^2
-plot(f == 0)
+plot(f ⩵ 0)
 
 ## trident of Newton
 c,d,e,h = 1,1,1,1
@@ -135,7 +135,8 @@ end
                    red=nothing,      # or :red ...
                    fillcolor=:black,
                    black=nothing,
-                   map=nothing       # union(Nothing, Function...)
+                   map=nothing,       # union(Nothing, Function...)
+                   zpos=nothing
                    )
 
 #    L, R = extrema(x)
@@ -157,13 +158,14 @@ end
         @series begin
 
             xs, ys = get_xs_ys(map, r, L, R, B, T, W, H)
-
+            zs = isnothing(zpos) ? nothing : zpos*ones(length(xs))
 
             seriestype := :shape
             fillcolor := red
             linewidth := 0
             x := xs
             y := ys
+            z := zs
 
             ()
         end
@@ -179,8 +181,10 @@ end
     linewidth --> 0
 
     xs, ys = get_xs_ys(map, b, L, R, B, T, W, H)
+    zs = isnothing(zpos) ? nothing : zpos*ones(length(xs))
     x --> xs
     y --> ys
+    z --> zs
 
     ()
 
