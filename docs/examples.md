@@ -189,6 +189,24 @@ tl(x) = b + dydx(a,b)*(x-a)
 plot!(tl, linewidth=3, -5, 5)
 ```
 
+## 3D Plots
+
+Embedding in 3D is done using the `zpos` keyword. This can be used to create Z-scans.
+The following example produces cross sections through an ellipsoid:
+
+```
+using Plots, ColorSchemes
+gr()
+using ImplicitEquations
+
+
+ellipsoid(x,y,z) = 6y^2 + 3x^2 + z^2 - 2.8y*z
+zrange = -2.5:0.5:2.5
+
+plt = plot( palette = palette(cgrad([:red,:green,:blue],length(zrange))), camera=(45,45),xlabel="x",ylabel="y",zlabel="z")
+[plot!(plt,((x,y)->ellipsoid(x,y,z))⩵ 5, zpos=z) for z=zrange]
+plt
+```
 
 ## Alternatives
 
