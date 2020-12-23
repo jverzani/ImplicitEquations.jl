@@ -1,6 +1,6 @@
 name = "ImplicitEquations"
 uuid = "95701278-4526-5785-aba3-513cca398f19"
-version = "1.0.3"
+version = "1.0.4"
 
 [deps]
 IntervalArithmetic = "d1acc4aa-44c8-5952-acd4-ba5d80a2a253"

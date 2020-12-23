@@ -86,7 +86,7 @@ end
 (&)(r1::Pred, r2::Pred) = Preds([r1,r2], Any[&])
 (|)(r1::Pred, r2::Pred) = Preds([r1,r2], Any[|])
 
-(&)(ps::Preds, r1::Pred) = Preds([ps.ps, r1], [ps.ops, &])
+(&)(ps::Preds, r1::Pred) = Preds(vcat(ps.ps, r1), vcat(ps.ops, &))
 (&)(r1::Pred, ps::Preds) = ps & r1
 (|)(ps::Preds, r1::Pred) = Preds(vcat(ps.ps, r1), vcat(ps.ops, |))
 (|)(r1::Pred, ps::Preds) = ps | r1
