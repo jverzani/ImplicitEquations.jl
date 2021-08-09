@@ -11,7 +11,7 @@ abstract type Predicate end
 
 A predicate is defined in terms of a function of two variables, an
 inquality, and either another function or a real number.  They are
-conveniently created by the functions `Lt`, `Le`, `Eq`, `Neq`, `Ge`,
+conveniently created by the functions `Lt`, `Le`, `Eq`, `Ne`, `Ge`,
 and `Gt`. The equivalent unicode operators:
 
 * `≪` (`\\ll[tab]`),
@@ -43,28 +43,26 @@ preds = [(:Lt, :≪, :<), # \ll
          (:Gt, :≫, :>) # \gg
          ]
 
-for (fn, uop, op) in preds
+
+    # type piracy of CommonEq
+    for (fn,uop, op) ∈ (
+        (:Lt, :≪, :<), # \ll
+        (:Le, :≦, :<=), # \leqq
+        (:Eq, :⩵, :(==)), # \Equal
+        (:Ge, :≧, :>=), # \gegg
+        (:Gt, :≫, :>) # \gg
+    )
     fnname =  string(fn)
     @eval begin
-        ($fn)(f, x::Real) = Pred(f, $op, x)
-        ($uop)(f, x::Real) = ($fn)(f, x)
-        ($fn)(f, g) = $(fn)((x,y) -> f(x,y) - g(x,y), 0)
-        ($uop)(f, g) = ($fn)(f, g)
+        (CommonEq.$fn)(f::Function, x::Real) = Pred(f, $op, x)
+        (CommonEq.$fn)(f::Function, g::Function) = $(fn)((x,y) -> f(x,y) - g(x,y), 0)
     end
     eval(Expr(:export, fn))
-    eval(Expr(:export, uop))
 end
 
-Neq(f, x::Real) = Pred(f, !== , x)
-Neq(f, g) = Neq((x,y) -> f(x,y) - g(x,y), 0)
-
-≶(x::Real, y::Real) = (x != y)
-≶(f, x::Real) = Neq(f, x)
-≶(f, g) = Neq(f, g)
-
-≷(x::Real, y::Real) = (x != y)
-≷(f, x::Real) = Neq(f, x)
-≷(f, g) = Neq(f, g)
+CommonEq.Ne(f::Function, x::Real) = Pred(f, !== , x)
+CommonEq.Ne(f::Function, g::Function) = Ne((x,y) -> f(x,y) - g(x,y), 0)
+const Neq = Ne # deprecate Neq
 
 
 

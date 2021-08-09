@@ -11,7 +11,7 @@ ImplicitEquations.GRAPH(f ≪  g, -5, 5, -5, 5, 2^4, 2^4)
 
 ImplicitEquations.GRAPH(f ≶  g, -5, 5, -5, 5, 2^4, 2^4)
 ImplicitEquations.GRAPH(f ≷  g, -5, 5, -5, 5, 2^4, 2^4)
-ImplicitEquations.GRAPH(Neq(f, g), -5, 5, -5, 5, 2^4, 2^4)
+ImplicitEquations.GRAPH(Ne(f, g), -5, 5, -5, 5, 2^4, 2^4)
 
 ImplicitEquations.GRAPH(Eq(f, g), -5, 5, -5, 5, 2^4, 2^4)
 ImplicitEquations.GRAPH(f ⩵ g, -5, 5, -5, 5, 2^4, 2^4)
