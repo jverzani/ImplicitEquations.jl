@@ -62,6 +62,7 @@ Base.show(io::IO,  o::OInterval)  = print(io, "OInterval: ", o.val, " def=", o.d
 ## some outer constructors...
 OInterval(a::T, b::S) where {T <: Real, S <: Real}= OInterval(Interval(a,b), TRUE, TRUE)
 OInterval(a::OInterval, b::OInterval) = a === a ? a : error("a is not b?") ## why is this one necessary?
+OInterval(a::OInterval) = a
 OInterval(a) = OInterval(a,a)   # thin one...
 OInterval(i::Interval) = OInterval(i.lo, i.hi)
 
@@ -77,6 +78,8 @@ struct Region
 end
 
 ImplicitEquations.diam(x::OInterval) = diam(x.val)
+Base.isfinite(x::OInterval) = isfinite(x.val)
+
 
 ## extend functions for OInterval
 ## Notice these return BIntervals -- not Bools
@@ -198,6 +201,14 @@ Base.acoth(x::OInterval) = atanh(1/x)
 
 
 Base.exp(x::OInterval) = OInterval(exp(x.val), x.def, x.cont)
+
+function Base.hypot(x::OInterval, y::OInterval)
+    val = hypot(x.val, y.val)
+    def = x
+
+    OInterval(val, x.def & y.def, x.cont & y.cont)
+end
+
 ## discontinous functions
 
 ## /
