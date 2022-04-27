@@ -12,16 +12,14 @@ abstract type Predicate end
 A predicate is defined in terms of a function of two variables, an
 inquality, and either another function or a real number.  They are
 conveniently created by the functions `Lt`, `Le`, `Eq`, `Ne`, `Ge`,
-and `Gt`. The equivalent unicode operators:
+and `Gt`. The following equivalent unicode operators may be used:
 
 * `≪` (`\\ll[tab]`),
 * `≦` (`\\leqq[tab]`),
 * `⩵` (`\\Equal[tab]`),
 * `≶` (`\\lessgtr[tab]`)  or `≷` (`\\gtrless[tab]`),
 * `≧` (`\\geqq[tab]`),
-* `≫` (`\\leqq[tab]`) may also be used.
-
-The use of Julia's usual comparison operators is no longer supported.
+* `≫` (`\\leqq[tab]`)
 
 To combine predicates, `&` and `|` can be used.
 

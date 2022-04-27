@@ -107,7 +107,7 @@ Base.isfinite(x::OInterval) = isfinite(x.val)
 Screen a value using `NaN` values.
 Use as  with `f(x,y) = x*y * screen(x > 0)`
 
-Also aliased to I_(x>0)
+Also aliased to `I_(x>0)`
 
 An expression like `x::OInterval > 0` is not Boolean, but
 rather a `BInterval` which allows for a "MAYBE" state. As such, a
