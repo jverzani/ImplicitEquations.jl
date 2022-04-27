@@ -1,28 +1,32 @@
 # ImplicitEquations
 
+[ImplicitEquations](https://github.com/jverzani/ImplicitEquations.jl)
+
+This paper by [Tupper](https://doi.org/10.1145/383259.383267) details
+a method for graphing two-dimensional implicit equations and
+inequalities. This package gives an implementation of the paper's
+basic algorithms to allow the `Julia` user to naturally represent and
+easily render graphs of implicit functions and equations.
 
 
-This paper by
-[Tupper](https://doi.org/10.1145/383259.383267)
-details a method for graphing two-dimensional implicit equations and
-inequalities. This package gives an
-implementation of the  paper's basic algorithms to allow
-the `julia` user to naturally represent and easily render graphs of
-implicit functions and equations.
+The [IntervalConstraintProgramming](https://github.com/JuliaIntervals/IntervalConstraintProgramming.jl) packages gives an alternative implementation.
 
 
-The basic idea is to express a equation in $x$ and $y$ variables in terms of a function of two variables as a predicate. The `plot` function `Plots` is used to plot these predicates.
+## Examples
 
 
+The basic idea is to express a equation in ``x`` and ``y`` variables in terms of a function of two variables as a predicate. The `plot` function `Plots` is used to plot these predicates.
+
+```@example IE
+using Plots, ImplicitEquations
+```
 
 
 For example, the
 [Devils curve](http://www-groups.dcs.st-and.ac.uk/~history/Curves/Devils.html)
 is graphed over the default region as follows:
 
-```
-using Plots, ImplicitEquations
-
+```@example IE
 a,b = -1,2
 f(x,y) = y^4 - x^4 + a*y^2 + b*x^2
 r = (f ⩵ 0) # \Equal[tab]
@@ -42,7 +46,7 @@ For example, the
 [Trident of Newton](http://www-history.mcs.st-and.ac.uk/Curves/Trident.html)
 can be represented in Cartesian form as follows:
 
-```
+```@example IE
 ## trident of Newton
 c,d,e,h = 1,1,1,1
 f(x,y) = x*y
@@ -53,14 +57,14 @@ plot(Eq(f,g)) ## aka f ⩵ g (using Unicode\Equal<tab>)
 
 Inequalities can be graphed as well
 
-```
+```@example IE
 f(x,y) = x - y
 plot(f ≪ 0) # \ll[tab]
 ```
 
 This example is from Tupper's paper:
 
-```
+```@example IE
 f(x,y) = (y-5)* cos(4sqrt((x-4)^2 +y^2))
 g(x,y) = x * sin(2*sqrt(x^2 + y^2))
 
@@ -81,13 +85,7 @@ predicate.
 
 * If definitely not, the region is labeled "white;"
 * if definitely yes, the region is labeled "black;"
-* else the square region is subdivided into 4 smaller regions and the
-above is repeated until subdivision would be below the pixel level. At
-which point, the remaining "1-by-1" pixels are checked for possible
-solutions, for example for equalities where continuity is known a
-random sample of points is investigated with the intermediate value
-theorem. A region may be labeled "black" or "red" if the predicate is
-still ambiguous.
+* else the square region is subdivided into 4 smaller regions and the above is repeated until subdivision would be below the pixel level. At which point, the remaining "1-by-1" pixels are checked for possible solutions, for example for equalities where continuity is known a random sample of points is investigated with the intermediate value theorem. A region may be labeled "black" or "red" if the predicate is still ambiguous.
 
 
 The graph plots each "black" region as a "pixel". The "red" regions
@@ -96,7 +94,7 @@ keyword `red`.
 
 For example, the Devil's curve is a bit different with red coloring:
 
-```
+```@example IE
 a,b = -1,2
 f(x,y) = y^4 - x^4 + a*y^2 + b*x^2
 r = (f ⩵ 0)
@@ -119,7 +117,7 @@ This example, the
 Uses a few new things: the `screen` function is used to restrict
 ranges and logical operators to combine predicates.
 
-```
+```@example IE
 f0(x,y) = ((x/7)^2 + (y/3)^2 - 1)  *   screen(abs(x)>3) * screen(y > -3*sqrt(33)/7)
 f1(x,y) = ( abs(x/2)-(3 * sqrt(33)-7) * x^2/112 -3 +sqrt(1-(abs((abs(x)-2))-1)^2)-y)
 f2(x,y) = y - (9 - 8*abs(x))       *   screen((abs(x)>= 3/4) &  (abs(x) <= 1) )
@@ -153,50 +151,48 @@ The above example illustrates a few things:
   by slow, it can mean really slow. The difference between rendering
   `(1-x^2)*(2-y^2)` and `csc(1-x^2)*cot(2-y^2)` can be 10 times.)
 
-## Maps
+### Maps
 
-If a function $f:C \rightarrow C$ is passed through the `map` argument
-of `plot`, each rectangle to render is mapped by the function $f$
+If a function ``f:C \rightarrow C`` is passed through the `map` argument
+of `plot`, each rectangle to render is mapped by the function ``f``
 prior to drawing. This allows for viewing of conformal maps. This
 example is one of
 [several](http://mathfaculty.fullerton.edu/mathews/c2003/ConformalMapDictionary.1.html):
 
-```
+```@example IE
 f(x,y) = x
 plot(f ≧ 1/2, map=z -> 1/z)
 ```
 
-The region that is mapped above is not the half plane $x >= 1/2$, but
-truncated by $|y| < 5$ due to the default values of `ylims`. Hence we
+The region that is mapped above is not the half plane ``x >= 1/2``, but
+truncated by ``|y| < 5`` due to the default values of `ylims`. Hence we
 don't see the full circle.
 
 As well, the pieces plotted are polygonal approximations to the
 correct image. Consequently, gaps can appear.
 
-## A "typical" application
+### A "typical" application
 
 A common calculus problem is to find the tangent line using implicit
 differentiation. We can plot the predicate to create the implicit graph, then add a layer with `plot!`:
 
-```
+```@example IE
 f(x,y) = x^2 + y^2
 plot(f ⩵ 2*3^2)
 
 ## now add tangent at (3,3)
 a,b = 3,3
-dydx(a,b) = -b/a             # implicit differentiate to get dy/dx =-y/x
+dydx(a,b) = -b/a             # implicit differentiation to get dy/dx = -y/x
 tl(x) = b + dydx(a,b)*(x-a)
 plot!(tl, linewidth=3, -5, 5)
 ```
 
-## 3D Plots
+### 3D Plots
 
-Embedding in 3D is done using the `zpos` keyword. This can be used to create Z-scans.
-The following example produces cross sections through an ellipsoid:
+Embedding in 3D is done using the `zpos` keyword. This can be used to create Z-scans. The following example produces cross sections through an ellipsoid, though it isn't displayed.
 
 ```
 using Plots, ColorSchemes
-gr()
 using ImplicitEquations
 
 
@@ -208,7 +204,7 @@ plt = plot( palette = palette(cgrad([:red,:green,:blue],length(zrange))), camera
 plt
 ```
 
-## Alternatives
+### Alternatives
 
 Many such plots are simply a single level of a contour plot. Contour
 plots can be drawn with the `Plots` package too. A simple contour plot
@@ -223,18 +219,9 @@ The package
 [IntervalConstraintProgramming ](https://github.com/dpsanders/IntervalConstraintProgramming.jl)
 also allows for this type of graphing, and more.
 
-## TODO
 
-*LOTS*:
+## Reference
 
-* Check out these graphs to see which can be done
-- http://www.xamuel.com/graphs-of-implicit-equations/
-- http://www.peda.com/grafeq/gallery.html
-
-* branch cut tracking and interval sets are employed by Tupper, these
-  could be added. This would allow some other functions such as `mod`,
-  or `±` to be defined.
-
-* Tupper sketches out how to be more rigorous with computing whether a region is black or white.
-
-* increase speed (could color 1-pixel regions better if so, perhaps; division checks; type stability).
+```@autodocs
+Modules = [ImplicitEquations]
+```

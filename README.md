@@ -1,4 +1,9 @@
-[![Build Status](https://travis-ci.com/jverzani/ImplicitEquations.jl.svg?branch=master)](https://travis-ci.com/jverzani/ImplicitEquations.jl)
+
+[![Stable](https://img.shields.io/badge/docs-stable-blue.svg)](https://jverzani.github.io/ImplicitEquations.jl/stable)
+[![Dev](https://img.shields.io/badge/docs-dev-blue.svg)](https://jverzani.github.io/ImplicitEquations.jl/dev)
+[![Build Status](https://github.com/jverzani/ImplicitEquations.jl/workflows/CI/badge.svg)](https://github.com/jverzani/ImplicitEquations.jl/actions)
+[![codecov](https://codecov.io/gh/jverzani/ImplicitEquations.jl/branch/master/graph/badge.svg)](https://codecov.io/gh/jverzani/ImplicitEquations.jl)
+
 
 
 # ImplicitEquations
@@ -12,20 +17,19 @@ the `Julia` user to naturally represent and easily render graphs of
 implicit functions and equations.
 
 
-We give one example, others may be viewed as an `IJulia` notebook ([here](http://nbviewer.ipython.org/github/jverzani/ImplicitEquations.jl/blob/master/docs/examples.ipynb)).
+We give one example, others may be viewed in the documentation.
 
 The
 [Devils curve](http://www-groups.dcs.st-and.ac.uk/~history/Curves/Devils.html)
 is graphed over the default region as follows:
 
 ```
-using Plots
-pyplot()
-using ImplicitEquations
+using Plots, ImplicitEquations
 
 a,b = -1,2
 f(x,y) = y^4 - x^4 + a*y^2 + b*x^2
-plot(f ⩵ 0)  # \Equal[tab]
+
+plot(f ⩵ 0)  # \Equal[tab] or Eq(f, 0)
 ```
 
 ![DevilsCurve](http://i.imgur.com/LChTzC1.png)

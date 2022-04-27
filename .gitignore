@@ -1,3 +1,9 @@
-appveyor.yml
-.travis.yml
+*.jl.cov
+*.jl.*.cov
+*.jl.mem
+docs/build
+docs/site
+docs/Manifest.toml
+test/benchmarks.json
 Manifest.toml
+TODO.md

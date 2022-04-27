@@ -28,7 +28,6 @@ For text-based plots, the `asciigraph` function is available.
 Examples:
 ```
 using Plots, ImplicitEquations
-pyplot()
 
 a,b = -1,2
 f(x,y) = y^4 - x^4 + a*y^2 + b*x^2
@@ -38,13 +37,13 @@ plot(f ⩵ 0)
 c,d,e,h = 1,1,1,1
 f(x,y) = x*y
 g(x,y) =c*x^3 + d*x^2 + e*x + h
-plot(eq(f,g), title="Trident of Newton") ## aka f ⩵ g (using Unicode\\Equal[tab])
+plot(Eq(f,g); title="Trident of Newton") ## aka f ⩵ g (using Unicode\\Equal[tab])
 
 ## inequality
 f(x,y)= (y-5)*cos(4*sqrt((x-4)^2 + y^2))
 g(x,y) = x*sin(2*sqrt(x^2 + y^2))
-r = f < g
-plot(r, (-10, 10), (-10, 10), N=9, M=9)  # (xmin, xmax), (ymin, ymax),
+r = f ≦ g
+plot(r; ylim=(-10, 10), xlim=(-10, 10), N=9, M=9)
 ```
 """
 plot_implicit = nothing
@@ -130,8 +129,8 @@ end
 ## N, M give no. of pixels 2^N by 2^M
 ## red and black are used for colors.
 @recipe function f(p::Predicate; #, x=(-5,5), y=(-5,5);
-                   N=10,
-                   M=10,              # oddly m as keyword fails. 9/8 too slow
+                   N=8,
+                   M=8,              # oddly m as keyword fails. 9/8 too slow
                    red=nothing,      # or :red ...
                    fillcolor=:black,
                    black=nothing,
