@@ -1,6 +1,6 @@
 name = "ImplicitEquations"
 uuid = "95701278-4526-5785-aba3-513cca398f19"
-version = "1.0.8"
+version = "1.0.9"
 
 [deps]
 CommonEq = "3709ef60-1bee-4518-9f2f-acd86f176c50"
