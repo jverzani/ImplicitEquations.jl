@@ -12,5 +12,5 @@ Unicode = "4ec0a83e-493e-50e2-b9ac-8f72acf5a8f5"
 [compat]
 CommonEq = "0.2"
 IntervalArithmetic = "0.15, 0.16, 0.17, 0.18, 0.19, 0.20"
-RecipesBase = "0.5, 0.6, 0.7, 0.8, ~1.0, ~1.1, ~1.2"
+RecipesBase = "0.5, 0.6, 0.7, 0.8, 1"
 julia = "1.0"
